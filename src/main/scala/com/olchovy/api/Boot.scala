@@ -6,12 +6,12 @@ import cc.spray.{RootService, HttpService}
 
 class Boot(system: ActorSystem)
 {
-  val mainModule = new RestService {
+  val restModule = new RestModule {
     implicit def actorSystem = system
   }
 
   val restService = system.actorOf(
-    props = Props(new HttpService(mainModule.restService)),
+    props = Props(new HttpService(restModule.service)),
     name = "rest-service"
   )
 

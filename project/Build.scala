@@ -13,7 +13,7 @@ object Build extends sbt.Build
     .settings(WebPlugin.webSettings: _*)
     .settings(port in config("container") := 8080)
     .settings(
-      organization  := "com.example",
+      organization  := "com.olchovy",
       version       := "0.1.0",
       scalaVersion  := "2.9.1",
       scalacOptions := Seq("-deprecation", "-encoding", "utf8"),

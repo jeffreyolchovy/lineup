@@ -10,11 +10,11 @@ import cc.spray.json._
 import cc.spray.typeconversion.SprayJsonSupport._
 
 
-trait RestService extends Directives
+trait RestModule extends Directives
 {
   import DefaultJsonProtocol._
 
-  val restService = {
+  val service = {
     path("") {
       get { _.complete(Map("response" → "Not yet implemented")) }
     }

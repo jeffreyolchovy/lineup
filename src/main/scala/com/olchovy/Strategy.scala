@@ -1,8 +1,10 @@
 package com.olchovy
 
+import annotation.tailrec
+import collection.mutable
 import math.{ceil, min}
 import util.Random
-import com.olchovy.domain._
+import com.olchovy.domain._, Statistic._
 
 
 trait Strategy
@@ -19,21 +21,23 @@ trait Strategy
 
   def execute(lineup: Lineup): Set[Lineup] = execute(initialize(lineup))
 
-  private def initialize(seed: Lineup): Set[Lineup] = {
-    Set(seed) ++ (for(i ← 1 to INITIAL_POPULATION_SIZE) yield Lineup(Random.shuffle(seed.players)))
-  }
-
-  private def execute(lineups: Set[Lineup], generation: Int = 0): Set[Lineup] = {
+  @tailrec private def execute(lineups: Set[Lineup], generation: Int = 0): Set[Lineup] = {
     if(generation < MAX_GENERATIONS) {
+      // calculate the fitness threshold that must be reached to retain the lineup
+      val generationThreshold = threshold(generation)
+
+      // score lineups, retaining only those that exceed the threshold
       val scoredLineups = lineups.flatMap { lineup =>
         fitness(lineup) match {
-          case fitness if fitness > threshold(generation) => Some((fitness, lineup))
+          case fitness if fitness >= generationThreshold => Some((fitness, lineup))
           case _ => None
         }
       }
 
+      // divide lineups into two sets, one to be mutated, one to be recombinated
       val (lineupsToMutate, lineupsToCrossover) = scoredLineups.splitAt(ceil(scoredLineups.size / 2.0).toInt)
 
+      // the set of lineups that have either been mutated or the original (if the mutated one scored lower)
       val mutatedLineups = lineupsToMutate.map {
         case (score, lineup) =>
           val mutated = mutate(lineup)
@@ -41,18 +45,23 @@ trait Strategy
           if(mutatedScore > score) mutated else lineup
       }
 
+      // the set of lineups that have been bred or the originals (if the children have scored lower)
       val recombinatedLineups = lineupsToCrossover.toSeq.grouped(2).collect {
-        case Seq((score1, lineup1), (score2, lineup2)) =>
+        case seq @ Seq((score1, lineup1), (score2, lineup2)) =>
           val (lineup3, lineup4) = crossover(lineup1, lineup2)
           val score3 = fitness(lineup3)
           val score4 = fitness(lineup4)
-          Seq(if(score3 > score1) lineup3 else lineup1, if(score4 > score2) lineup4 else lineup2)
+          (seq ++ Seq((score3, lineup3), (score4, lineup4))).sortWith { (a, b) => a._1 > b._1 }.take(2).map(_._2)
       }.flatten.toSet
 
       execute(mutatedLineups ++ recombinatedLineups, generation + 1)
     } else {
       lineups
     }
+  }
+
+  private def initialize(seed: Lineup): Set[Lineup] = {
+    Set(seed) ++ (for(i ← 1 to INITIAL_POPULATION_SIZE) yield Lineup(Random.shuffle(seed.players)))
   }
 
   private def threshold(generation: Int) = generation match {
@@ -105,62 +114,79 @@ trait Strategy
   }
 }
 
-class DefaultStrategy extends Strategy
+trait MemoizingStrategy
 {
-  val INITIAL_POPULATION_SIZE = 2500
+  this: Strategy =>
 
-  val INITIAL_FITNESS_THRESHOLD = 1.0
+  private val cache = mutable.Map.empty[Lineup, Double]
+
+  def fitness(lineup: Lineup): Double = lookupFitness(lineup).getOrElse {
+    val score = computeFitness(lineup)
+    cache(lineup) = score
+    score
+  }
+
+  protected def lookupFitness(lineup: Lineup): Option[Double] = cache.get(lineup)
+
+  protected def computeFitness(lineup: Lineup): Double
+}
+
+class DefaultStrategy extends Strategy with MemoizingStrategy
+{
+  val INITIAL_POPULATION_SIZE = 500
+
+  val INITIAL_FITNESS_THRESHOLD = 0.1
 
   val MAX_FITNESS_THRESHOLD = 4.0
 
-  val MAX_GENERATIONS = 100
+  val MAX_GENERATIONS = 50
 
-  def fitness(lineup: Lineup): Double = lineup.players.zipWithIndex.map {
+  protected def computeFitness(lineup: Lineup): Double = lineup.players.zipWithIndex.map {
     case (player, index) => index match {
       case 0 =>
-        (player.statistics.OBA - lineup.OBA) +
-        (player.statistics.`BB/AB` - lineup.`BB/AB`) +
-        (lineup.PIP - player.statistics.PIP) +
-        (lineup.`HR/H` - player.statistics.`HR/H`)
+        (player.stat(OBA) - lineup.stat(OBA)) +
+        (player.stat(`BB/AB`) - lineup.stat(`BB/AB`)) +
+        (lineup.stat(PIP) - player.stat(PIP)) +
+        (lineup.stat(`HR/H`) - player.stat(`HR/H`))
       case 1 => 
-        (player.statistics.SLG - lineup.SLG) +
-        (player.statistics.OBA - lineup.OBA) + 
-        (player.statistics.`BB/AB` - lineup.`BB/AB`) +
-        (lineup.PIP - player.statistics.PIP) +
-        (lineup.EBA - player.statistics.EBA)
+        (player.stat(SLG) - lineup.stat(SLG)) +
+        (player.stat(OBA) - lineup.stat(OBA)) + 
+        (player.stat(`BB/AB`) - lineup.stat(`BB/AB`)) +
+        (lineup.stat(PIP) - player.stat(PIP)) +
+        (lineup.stat(EBA) - player.stat(EBA))
       case 2 =>
-        (player.statistics.SLG - lineup.SLG) +
-        (player.statistics.PIP - lineup.PIP) +
-        (player.statistics.`BB/AB` - lineup.`BB/AB`)
+        (player.stat(SLG) - lineup.stat(SLG)) +
+        (player.stat(PIP) - lineup.stat(PIP)) +
+        (player.stat(`BB/AB`) - lineup.stat(`BB/AB`))
       case 3 =>
-        (player.statistics.SLG - lineup.SLG) +
-        (player.statistics.OBA - lineup.OBA) + 
-        (player.statistics.`HR/H` - lineup.`HR/H`)
+        (player.stat(SLG) - lineup.stat(SLG)) +
+        (player.stat(OBA) - lineup.stat(OBA)) + 
+        (player.stat(`HR/H`) - lineup.stat(`HR/H`))
       case 4 | 6 =>
-        (player.statistics.SLG - lineup.SLG) +
-        (player.statistics.PIP - lineup.PIP) +
-        (lineup.`HR/H` - player.statistics.`HR/H`)
+        (player.stat(SLG) - lineup.stat(SLG)) +
+        (player.stat(PIP) - lineup.stat(PIP)) +
+        (lineup.stat(`HR/H`) - player.stat(`HR/H`))
       case 5 | 7 =>
-        (player.statistics.SLG - lineup.SLG) +
-        (player.statistics.PIP - lineup.PIP) +
-        (player.statistics.OBA - lineup.OBA) +
-        (player.statistics.`SO/AB` - lineup.`SO/AB`)
+        (player.stat(SLG) - lineup.stat(SLG)) +
+        (player.stat(PIP) - lineup.stat(PIP)) +
+        (player.stat(OBA) - lineup.stat(OBA)) +
+        (player.stat(`SO/AB`) - lineup.stat(`SO/AB`))
       case 8 =>
-        (player.statistics.PIP - lineup.PIP) +
-        (lineup.OBA - player.statistics.OBA)
+        (player.stat(PIP) - lineup.stat(PIP)) +
+        (lineup.stat(OBA) - player.stat(OBA))
       case 9 =>
-        (player.statistics.PIP - lineup.PIP) +
-        (player.statistics.`HR/H` - lineup.`HR/H`) +
-        (lineup.SLG - player.statistics.SLG) +
-        (lineup.OBA - player.statistics.OBA) +
-        (lineup.`BB/AB` - player.statistics.`BB/AB`)
-      case 10 =>
-        (player.statistics.`1B/H` - lineup.`1B/H`) +
-        (lineup.PIP - player.statistics.PIP) +
-        (lineup.`SO/AB` - player.statistics.`SO/AB`) +
-        (lineup.SLG - player.statistics.SLG) +
-        (lineup.OBA - player.statistics.OBA) +
-        (lineup.`BB/AB` - player.statistics.`BB/AB`)
+        (player.stat(PIP) - lineup.stat(PIP)) +
+        (player.stat(`HR/H`) - lineup.stat(`HR/H`)) +
+        (lineup.stat(SLG) - player.stat(SLG)) +
+        (lineup.stat(OBA) - player.stat(OBA)) +
+        (lineup.stat(`BB/AB`) - player.stat(`BB/AB`))
+      case 10 => 
+        (player.stat(`1B/H`) - lineup.stat(`1B/H`)) +
+        (lineup.stat(PIP) - player.stat(PIP)) +
+        (lineup.stat(`SO/AB`) - player.stat(`SO/AB`)) +
+        (lineup.stat(SLG) - player.stat(SLG)) +
+        (lineup.stat(OBA) - player.stat(OBA)) +
+        (lineup.stat(`BB/AB`) - player.stat(`BB/AB`))
       //case 11 =>
       //case 12 =>
       case _ => 0

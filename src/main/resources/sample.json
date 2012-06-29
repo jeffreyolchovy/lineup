@@ -1,0 +1,24 @@
+{ "lineup" : 
+  [
+    { "name" : ""
+    , "statistics" : 
+      {
+      }
+    }
+  , { "name" : ""
+    , "statistics" :
+      {
+      }
+    }
+  ]
+, "strategy" :
+  { "initial_population_size" : 2500
+  , "initial_fitness_threshold" : 1.0
+  , "maximum_fitness_threshold" : 4.0
+  , "maximum_generations" : 100
+  , "fitness_specificiation" :
+    [ ["+OBA", "-PIP"]
+    , ["+OBA"]
+    ]
+  }
+}

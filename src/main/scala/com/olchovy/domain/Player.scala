@@ -1,8 +1,45 @@
 package com.olchovy.domain
 
+import Statistic._
 
-case class Player(name: String, position: Option[String], statistics: Player.Statistics)
+
+case class Player(name: String, private val _stats: Map[Statistic.Value, Double])
 {
+  lazy val stats: Map[Statistic.Value, Double] = _stats ++ Map(
+    `1B` → _1B,
+    AVG → _AVG,
+    SLG → _SLG,
+    OBA → _OBA,
+    EBA → _EBA,
+    PIP → _PIP,
+    `HR/H`  → `_HR/H`,
+    `BB/AB` → `_BB/AB`,
+    `SO/AB` → `_SO/AB`,
+    `1B/H`  → `_1B/H`
+  )
+
+  private lazy val _1B = _stats(H) - (_stats(`2B`) + _stats(`3B`) + _stats(HR))
+
+  private lazy val _AVG = _stats(H) / _stats(AB)
+
+  private lazy val _SLG = (_1B + (2 * _stats(`2B`)) + (3 * _stats(`3B`)) + (4 * _stats(HR))) / _stats(AB)
+  
+  private lazy val _OBA = (_stats(H) + _stats(BB)) / (_stats(AB) + _stats(BB) + _stats(SF))
+
+  private lazy val _EBA = ((_stats(`2B`) + 2) * (_stats(`3B`) + 3) * _stats(HR) + _stats(BB)) / _stats(AB)
+
+  private lazy val _PIP = 1 - (_stats(SO) / _stats(AB))
+
+  private lazy val `_HR/H` = _stats(HR) / _stats(H)
+
+  private lazy val `_BB/AB` = _stats(BB) / _stats(AB)
+
+  private lazy val `_SO/AB` = _stats(SO) / _stats(AB)
+
+  private lazy val `_1B/H` = _1B / _stats(H)
+
+  def stat(name: Statistic.Value): Double = stats(name)
+
   override def toString = name
 
   override def equals(that: Any): Boolean = that match {
@@ -13,56 +50,3 @@ case class Player(name: String, position: Option[String], statistics: Player.Sta
   override def hashCode = name.toUpperCase.hashCode
 }
 
-object Player
-{
-  def apply(_name: String, _statistics: Player.Statistics): Player = {
-    Player(_name, None, _statistics)
-  }
-
-  def apply(_name: String, _position: String, _statistics: Player.Statistics): Player = {
-    Player(_name, Some(_position), _statistics)
-  }
-
-  case class Statistics
-  (
-      G : Int, // games
-     AB : Int, // at-bats
-      H : Int, // hits
-   `2B` : Int, // doubles
-   `3B` : Int, // triples
-     HR : Int, // home runs
-    RBI : Int, // runs batted-in
-      R : Int, // runs
-     BB : Int, // walks
-     SO : Int, // strike outs
-     SF : Int, // sacrifice fly-outs
-      E : Int  // errors
-  )
-  {
-    /* singles */
-    lazy val `1B`: Int = H - (`2B` + `3B` + HR) 
-
-    /* batting average */
-    lazy val AVG: Double = H / (AB: Double)
-
-    /* slugging average */
-    lazy val SLG: Double = (`1B` + (2 * `2B`) + (3 * `3B`) + (4 * HR)) / (AB: Double)
-
-    /* on-base average */
-    lazy val OBA: Double = (H + BB) / ((AB: Double) + BB + SF)
-
-    /* extra-base average */
-    lazy val EBA: Double = ((`2B` + 2) * (`3B` + 3) * HR + BB) / (AB: Double) 
-
-    /* put-in-play percentage */
-    lazy val PIP: Double = 1 - (SO / (AB: Double))
-
-    lazy val `HR/H`: Double = HR / (H: Double)
-
-    lazy val `BB/AB`: Double = BB / (AB: Double)
-
-    lazy val `SO/AB`: Double = SO / (AB: Double)
-
-    lazy val `1B/H`: Double = `1B` / (H: Double)
-  }
-}

@@ -1,7 +1,7 @@
 package com.olchovy.cli
 
 import util.Random
-import com.olchovy.domain._
+import com.olchovy.domain._, Statistic._
 
 
 object Boot
@@ -16,21 +16,22 @@ object Boot
     val rows = lines.tail.map(line => ListMap(columns.zip(line.split(",")): _*))
     val players = rows.map { row =>
       val name = row("name")
-      val position = row.get("position").filter(!_.isEmpty)
-      val G = row("G").toInt
-      val AB = row("AB").toInt
-      val H = row("H").toInt
-      val `2B` = row("2B").toInt
-      val `3B` = row("3B").toInt
-      val HR = row("HR").toInt
-      val RBI = row("RBI").toInt
-      val R = row("R").toInt
-      val BB = row("BB").toInt
-      val SO = row("SO").toInt
-      val SF = row("SF").toInt
-      val E = row("E").toInt
+      val stats = Map(
+        G → row("G").toDouble,
+        AB → row("AB").toDouble,
+        H → row("H").toDouble,
+        `2B` → row("2B").toDouble,
+        `3B` → row("3B").toDouble,
+        HR → row("HR").toDouble,
+        RBI → row("RBI").toDouble,
+        R → row("R").toDouble,
+        BB → row("BB").toDouble,
+        SO → row("SO").toDouble,
+        SF → row("SF").toDouble,
+        E → row("E").toDouble
+      )
 
-      Player(name, position, Player.Statistics(G, AB, H, `2B`, `3B`, HR, RBI, R, BB, SO, SF, E))
+      Player(name, stats)
     }
 
     Lineup(players)
