@@ -21,10 +21,11 @@ object Statistic extends Enumeration
   ,   OBA     // on-base average
   ,   EBA     // extra-base average
   ,   PIP     // put-in-play percentage
-  ,   `HR/H`  // home runs per hit
-  ,   `BB/AB` // walks per at-bat
-  ,   `SO/AB` // strike outs per at-bat
-  ,   `1B/H`  // singles per at-bat
   = Value
+
+  val `HR/H`  = Value("HR/H")   // home runs per hit
+  val `BB/AB` = Value("BB/AB")  // walks per at-bat
+  val `SO/AB` = Value("SO/AB")  // strike outs per at-bat
+  val `1B/H`  = Value("1B/H")   // singles per at-bat
 }
 
