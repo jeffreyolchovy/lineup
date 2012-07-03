@@ -133,13 +133,13 @@ trait MemoizingStrategy
 
 class DefaultStrategy extends Strategy with MemoizingStrategy
 {
-  val INITIAL_POPULATION_SIZE = 500
+  val INITIAL_POPULATION_SIZE = DefaultStrategy.INITIAL_POPULATION_SIZE
 
-  val INITIAL_FITNESS_THRESHOLD = 0.1
+  val INITIAL_FITNESS_THRESHOLD = DefaultStrategy.INITIAL_FITNESS_THRESHOLD
 
-  val MAX_FITNESS_THRESHOLD = 4.0
+  val MAX_FITNESS_THRESHOLD = DefaultStrategy.MAX_FITNESS_THRESHOLD
 
-  val MAX_GENERATIONS = 50
+  val MAX_GENERATIONS = DefaultStrategy.MAX_GENERATIONS
 
   protected def computeFitness(lineup: Lineup): Double = lineup.players.zipWithIndex.map {
     case (player, index) => index match {
@@ -180,17 +180,27 @@ class DefaultStrategy extends Strategy with MemoizingStrategy
         (lineup.stat(SLG) - player.stat(SLG)) +
         (lineup.stat(OBA) - player.stat(OBA)) +
         (lineup.stat(`BB/AB`) - player.stat(`BB/AB`))
-      case 10 => 
+      case 10 | 11 => 
         (player.stat(`1B/H`) - lineup.stat(`1B/H`)) +
         (lineup.stat(PIP) - player.stat(PIP)) +
         (lineup.stat(`SO/AB`) - player.stat(`SO/AB`)) +
         (lineup.stat(SLG) - player.stat(SLG)) +
         (lineup.stat(OBA) - player.stat(OBA)) +
         (lineup.stat(`BB/AB`) - player.stat(`BB/AB`))
-      //case 11 =>
-      //case 12 =>
       case _ => 0
     }
   }.sum
 }
+
+object DefaultStrategy
+{
+  val INITIAL_POPULATION_SIZE = 500
+
+  val INITIAL_FITNESS_THRESHOLD = 1.0
+
+  val MAX_FITNESS_THRESHOLD = 4.0
+
+  val MAX_GENERATIONS = 50
+}
+
 
