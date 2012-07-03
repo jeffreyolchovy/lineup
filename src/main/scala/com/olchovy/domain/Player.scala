@@ -3,7 +3,7 @@ package com.olchovy.domain
 import Statistic._
 
 
-case class Player(name: String, private val _stats: Map[Statistic.Value, Double])
+class Player private(val name: String, private val _stats: Map[Statistic.Value, Double])
 {
   lazy val stats: Map[Statistic.Value, Double] = _stats ++ Map(
     `1B` → _1B,
@@ -41,12 +41,12 @@ case class Player(name: String, private val _stats: Map[Statistic.Value, Double]
   def stat(name: Statistic.Value): Double = stats(name)
 
   override def toString = name
+}
 
-  override def equals(that: Any): Boolean = that match {
-    case player: Player ⇒ name == player.name
-    case _ => false
+object Player
+{
+  def apply(name: String, stats: Map[Statistic.Value, Double]): Player = {
+    new Player(name, Statistic.values.map { value ⇒ value → stats.getOrElse(value, 0.0) }.toMap)
   }
-
-  override def hashCode = name.toUpperCase.hashCode
 }
 
