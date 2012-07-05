@@ -9,6 +9,8 @@ import com.olchovy.domain._, Statistic._
 
 trait Strategy
 {
+  val LINEUP_SIZE: Int
+
   val INITIAL_POPULATION_SIZE: Int
 
   val INITIAL_FITNESS_THRESHOLD: Double
@@ -19,7 +21,7 @@ trait Strategy
 
   def fitness(lineup: Lineup): Double
 
-  def execute(lineup: Lineup): Set[Lineup] = execute(initialize(lineup))
+  def execute(players: Seq[Player]): Set[Lineup] = execute(initialize(players))
 
   @tailrec private def execute(lineups: Set[Lineup], generation: Int = 0): Set[Lineup] = {
     if(generation < MAX_GENERATIONS) {
@@ -60,9 +62,9 @@ trait Strategy
     }
   }
 
-  private def initialize(seed: Lineup): Set[Lineup] = {
-    Set(seed) ++ (for(i ← 1 to INITIAL_POPULATION_SIZE) yield Lineup(Random.shuffle(seed.players)))
-  }
+  private def initialize(seed: Seq[Player]): Set[Lineup] = {
+    for(i ← 1 to INITIAL_POPULATION_SIZE) yield Lineup(Random.shuffle(seed).take(LINEUP_SIZE))
+  }.toSet
 
   private def threshold(generation: Int) = generation match {
     case 0 => INITIAL_FITNESS_THRESHOLD
@@ -84,13 +86,19 @@ trait Strategy
       val index1 = array1.indexOf(value2)
       val index2 = array2.indexOf(value1)
 
-      array2(i) = value1
-      array1(i) = value2
+      // lineups can not be recombinated reliably
+      // mutate each independently
+      if(index1 == -1 || index2 == -1)
+        (mutate(lineup1), mutate(lineup2))
+      else {
+        array2(i) = value1
+        array1(i) = value2
 
-      array1(index1) = value1
-      array2(index2) = value2
+        array1(index1) = value1
+        array2(index2) = value2
 
-      (Lineup(array1.toSeq), Lineup(array2.toSeq))
+        (Lineup(array1.toSeq), Lineup(array2.toSeq))
+      }
     }
   }
 
@@ -131,7 +139,7 @@ trait MemoizingStrategy
   protected def computeFitness(lineup: Lineup): Double
 }
 
-class DefaultStrategy extends Strategy with MemoizingStrategy
+abstract class DefaultStrategy extends Strategy with MemoizingStrategy
 {
   val INITIAL_POPULATION_SIZE = DefaultStrategy.INITIAL_POPULATION_SIZE
 
@@ -140,6 +148,77 @@ class DefaultStrategy extends Strategy with MemoizingStrategy
   val MAX_FITNESS_THRESHOLD = DefaultStrategy.MAX_FITNESS_THRESHOLD
 
   val MAX_GENERATIONS = DefaultStrategy.MAX_GENERATIONS
+}
+
+object DefaultStrategy
+{
+  val INITIAL_POPULATION_SIZE = 2500
+
+  val INITIAL_FITNESS_THRESHOLD = 1.0
+
+  val MAX_FITNESS_THRESHOLD = 4.0
+
+  val MAX_GENERATIONS = 100
+}
+
+class DefaultBaseballStrategy extends DefaultStrategy
+{
+  val LINEUP_SIZE = 9
+
+  protected def computeFitness(lineup: Lineup): Double = lineup.players.zipWithIndex.map {
+    case (player, index) => index match {
+      case 0 =>
+        (player.stat(OBA) - lineup.stat(OBA)) +
+        (player.stat(`BB/AB`) - lineup.stat(`BB/AB`)) +
+        (lineup.stat(PIP) - player.stat(PIP)) +
+        (lineup.stat(`HR/H`) - player.stat(`HR/H`))
+      case 1 => 
+        (player.stat(SLG) - lineup.stat(SLG)) +
+        (player.stat(OBA) - lineup.stat(OBA)) + 
+        (player.stat(`BB/AB`) - lineup.stat(`BB/AB`)) +
+        (lineup.stat(PIP) - player.stat(PIP)) +
+        (lineup.stat(EBA) - player.stat(EBA))
+      case 2 =>
+        (player.stat(SLG) - lineup.stat(SLG)) +
+        (player.stat(PIP) - lineup.stat(PIP)) +
+        (player.stat(`BB/AB`) - lineup.stat(`BB/AB`))
+      case 3 =>
+        (player.stat(SLG) - lineup.stat(SLG)) +
+        (player.stat(OBA) - lineup.stat(OBA)) + 
+        (player.stat(`HR/H`) - lineup.stat(`HR/H`))
+      case 4 =>
+        (player.stat(SLG) - lineup.stat(SLG)) +
+        (player.stat(PIP) - lineup.stat(PIP)) +
+        (lineup.stat(`HR/H`) - player.stat(`HR/H`))
+      case 5 =>
+        (player.stat(SLG) - lineup.stat(SLG)) +
+        (player.stat(PIP) - lineup.stat(PIP)) +
+        (player.stat(OBA) - lineup.stat(OBA)) +
+        (player.stat(`SO/AB`) - lineup.stat(`SO/AB`))
+      case 6 =>
+        (player.stat(PIP) - lineup.stat(PIP)) +
+        (lineup.stat(OBA) - player.stat(OBA))
+      case 7 =>
+        (player.stat(PIP) - lineup.stat(PIP)) +
+        (player.stat(`HR/H`) - lineup.stat(`HR/H`)) +
+        (lineup.stat(SLG) - player.stat(SLG)) +
+        (lineup.stat(OBA) - player.stat(OBA)) +
+        (lineup.stat(`BB/AB`) - player.stat(`BB/AB`))
+      case 8 => 
+        (player.stat(`1B/H`) - lineup.stat(`1B/H`)) +
+        (lineup.stat(PIP) - player.stat(PIP)) +
+        (lineup.stat(`SO/AB`) - player.stat(`SO/AB`)) +
+        (lineup.stat(SLG) - player.stat(SLG)) +
+        (lineup.stat(OBA) - player.stat(OBA)) +
+        (lineup.stat(`BB/AB`) - player.stat(`BB/AB`))
+      case _ => 0
+    }
+  }.sum
+}
+
+class DefaultSoftballStrategy extends DefaultStrategy
+{
+  val LINEUP_SIZE = 12
 
   protected def computeFitness(lineup: Lineup): Double = lineup.players.zipWithIndex.map {
     case (player, index) => index match {
@@ -191,16 +270,4 @@ class DefaultStrategy extends Strategy with MemoizingStrategy
     }
   }.sum
 }
-
-object DefaultStrategy
-{
-  val INITIAL_POPULATION_SIZE = 500
-
-  val INITIAL_FITNESS_THRESHOLD = 1.0
-
-  val MAX_FITNESS_THRESHOLD = 4.0
-
-  val MAX_GENERATIONS = 50
-}
-
 

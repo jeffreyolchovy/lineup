@@ -15,7 +15,7 @@ class PlayerSuite extends FunSuite with BeforeAndAfter
     assert(player.name == "Foo")
   }
 
-  test("Player has stats") {
+  test("Player has non-empty stats") {
     assert(player.stats != Map.empty[Statistic.Value, Double])
   }
 

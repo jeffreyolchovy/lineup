@@ -26,4 +26,3 @@ class LineupSuite extends FunSuite with BeforeAndAfter
   }
 }
 
-
