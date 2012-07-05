@@ -8,6 +8,24 @@ package object io
 {
   import DefaultJsonProtocol._
 
+  private[io] trait JsonReaderUtils[A]
+  {
+    this: JsonReader[A] ⇒ 
+
+    import java.io.File
+    import scala.io.Source
+
+    def fromString(string: String): A = read(JsonParser(string))
+
+    def fromFile(filename: String): A = {
+      val filepath = if(filename.startsWith("/")) filename else absolutePath(filename)
+      fromString(Source.fromFile(filepath).mkString)
+    }
+
+    private def absolutePath(filename: String): String = {
+      "%s%s%s".format(System.getProperty("user.dir"), File.separator, filename)
+    }
+  }
 
   implicit object PlayerJsonFormat extends RootJsonFormat[Player]
   {
@@ -35,7 +53,7 @@ package object io
     )
   }
 
-  implicit object LineupJsonFormat extends RootJsonFormat[Lineup]
+  implicit object LineupJsonFormat extends RootJsonFormat[Lineup] with JsonReaderUtils[Lineup]
   {
     def read(json: JsValue): Lineup = json match {
       case array: JsArray ⇒ Lineup(array.elements.map(PlayerJsonFormat.read _))
@@ -45,30 +63,31 @@ package object io
     def write(lineup: Lineup): JsValue = JsArray(lineup.players.map(PlayerJsonFormat.write _): _*)
   }
 
-  implicit object StrategyJsonFormat extends RootJsonFormat[Strategy]
+  implicit object StrategyJsonFormat extends RootJsonFormat[Strategy] with JsonReaderUtils[Strategy]
   {
     import com.olchovy.dsl._
 
-
     def read(json: JsValue): Strategy = json match {
       case obj: JsObject ⇒ new Strategy with MemoizingStrategy {
-        override val INITIAL_POPULATION_SIZE = {
-          val value_? = obj.fields.get("initialPopulationSize")
+        lazy val LINEUP_SIZE = fitnessSpecification.size
+
+        val INITIAL_POPULATION_SIZE = {
+          val value_? = obj.fields.get("initial_population_size")
           value_?.map(_.convertTo[Int]).getOrElse(DefaultStrategy.INITIAL_POPULATION_SIZE)
         }
 
-        override val INITIAL_FITNESS_THRESHOLD = {
-          val value_? = obj.fields.get("initialFitnessThreshold")
+        val INITIAL_FITNESS_THRESHOLD = {
+          val value_? = obj.fields.get("initial_fitness_threshold")
           value_?.map(_.convertTo[Double]).getOrElse(DefaultStrategy.INITIAL_FITNESS_THRESHOLD)
         }
 
-        override val MAX_FITNESS_THRESHOLD = {
-          val value_? = obj.fields.get("maximumFitnessThreshold")
+        val MAX_FITNESS_THRESHOLD = {
+          val value_? = obj.fields.get("maximum_fitness_threshold")
           value_?.map(_.convertTo[Double]).getOrElse(DefaultStrategy.MAX_FITNESS_THRESHOLD)
         }
 
-        override val MAX_GENERATIONS = {
-          val value_? = obj.fields.get("maximumGenerations")
+        val MAX_GENERATIONS = {
+          val value_? = obj.fields.get("maximum_generations")
           value_?.map(_.convertTo[Int]).getOrElse(DefaultStrategy.MAX_GENERATIONS)
         }
 
@@ -77,14 +96,14 @@ package object io
           case _ ⇒ 0
         }.sum
 
-        private val fitnessSpecification: Seq[(Lineup, Player) => Double] = obj.fields("fitnessSpecification") match {
+        private val fitnessSpecification: Seq[(Lineup, Player) => Double] = obj.fields("fitness_specification") match {
           case array: JsArray ⇒ array.elements.zipWithIndex.map {
             case (value: JsArray, i) ⇒ FitnessSpecificationParser(value.elements.map(_.convertTo[String]).mkString(" "))
             case (value: JsString, i) ⇒ FitnessSpecificationParser(value.convertTo[String])
-            case (_, i) ⇒ deserializationError("Array or string expected for 'fitnessSpecification' element " + i)
+            case (_, i) ⇒ deserializationError("Array or string expected for 'fitness_specification' element " + i)
           }
 
-          case _ ⇒ deserializationError("Array expected for property 'fitnessSpecification'")
+          case _ ⇒ deserializationError("Array expected for property 'fitness_specification'")
         }
       }
 
