@@ -8,15 +8,44 @@ import util.Random
 import cc.spray._
 import cc.spray.json._
 import cc.spray.typeconversion.SprayJsonSupport._
+import com.olchovy.Strategy
+import com.olchovy.domain._
+import com.olchovy.io._
 
 
 trait RestModule extends Directives
 {
-  import DefaultJsonProtocol._
+  object RestJsonProtocol extends DefaultJsonProtocol
+  {
+    implicit object RequestJsonFormat extends RootJsonFormat[(Strategy, Lineup)]
+    {
+      def read(json: JsValue): (Strategy, Lineup) = json.asJsObject.getFields("strategy", "players") match {
+        case Seq(strategy, players) ⇒ (StrategyJsonFormat.read(strategy), LineupJsonFormat.read(players))
+        case _ ⇒ deserializationError("Object literal with properties 'strategy', 'players' expected")
+      }
+
+      def write(tuple: (Strategy, Lineup)): JsValue = serializationError("RequestJsonFormat is read-only")
+    }
+  }
 
   val service = {
-    path("") {
-      get { _.complete(Map("response" → "Not yet implemented")) }
+    import RestJsonProtocol._
+
+    path("lineup") {
+      post {
+        content(as[(Strategy, Lineup)]) {
+          case (strategy, roster) =>
+            val lineups = strategy.execute(roster.players)
+            _.complete(lineups.toSeq)
+        }
+      }
+    } ~
+    path("fitness") {
+      post {
+        content(as[(Strategy, Lineup)]) {
+          case (strategy, lineup) ⇒ _.complete(strategy.fitness(lineup).toString)
+        }
+      }
     }
   }
 }
