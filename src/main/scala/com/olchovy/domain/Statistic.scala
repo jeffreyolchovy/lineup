@@ -3,8 +3,7 @@ package com.olchovy.domain
 
 object Statistic extends Enumeration
 {
-  val G       // games  
-  ,   AB      // at-bats
+  val AB      // at-bats
   ,   H       // hits
   ,   `1B`    // singles
   ,   `2B`    // doubles
@@ -26,6 +25,6 @@ object Statistic extends Enumeration
   val `HR/H`  = Value("HR/H")   // home runs per hit
   val `BB/AB` = Value("BB/AB")  // walks per at-bat
   val `SO/AB` = Value("SO/AB")  // strike outs per at-bat
-  val `1B/H`  = Value("1B/H")   // singles per at-bat
+  val `1B/H`  = Value("1B/H")   // singles per hit
 }
 
