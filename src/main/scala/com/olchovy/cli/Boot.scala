@@ -36,7 +36,7 @@ object Boot
 
         println("SOLUTIONS FOUND: %s\n".format(solutions.size))
 
-        solutions.foreach { lineup =>
+        solutions.foreach { lineup ⇒
           println(lineup)
           println("----------------------------------------")
           println("HASHCODE: " + lineup.hashCode)

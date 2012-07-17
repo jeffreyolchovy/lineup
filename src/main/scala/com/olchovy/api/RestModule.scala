@@ -34,16 +34,21 @@ trait RestModule extends Directives
     path("lineup") {
       post {
         content(as[(Strategy, Lineup)]) {
-          case (strategy, roster) =>
-            val lineups = strategy.execute(roster.players)
-            _.complete(lineups.toSeq)
+          case (strategy, roster) ⇒
+            val lineups = strategy.execute(roster.players).map { lineup ⇒
+              (strategy.fitness(lineup), lineup.players.map(_.name))
+            }.toSeq.sortWith { (a, b) ⇒ 
+              a._1 > b._1
+            }.map(_._2)
+
+            _.complete(lineups)
         }
       }
     } ~
     path("fitness") {
       post {
         content(as[(Strategy, Lineup)]) {
-          case (strategy, lineup) ⇒ _.complete(strategy.fitness(lineup).toString)
+          case (strategy, lineup) ⇒ _.complete(Map("score" → strategy.fitness(lineup)))
         }
       }
     }

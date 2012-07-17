@@ -96,7 +96,7 @@ package object io
           case _ ⇒ 0
         }.sum
 
-        private val fitnessSpecification: Seq[(Lineup, Player) => Double] = obj.fields("fitness_specification") match {
+        private val fitnessSpecification: Seq[(Lineup, Player) ⇒ Double] = obj.fields("fitness_specification") match {
           case array: JsArray ⇒ array.elements.zipWithIndex.map {
             case (value: JsArray, i) ⇒ FitnessSpecificationParser(value.elements.map(_.convertTo[String]).mkString(" "))
             case (value: JsString, i) ⇒ FitnessSpecificationParser(value.convertTo[String])

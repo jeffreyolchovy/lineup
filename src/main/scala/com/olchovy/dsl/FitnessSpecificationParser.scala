@@ -5,6 +5,16 @@ import util.parsing.combinator.RegexParsers
 import com.olchovy.domain._
 
 
+/**
+ * A grammar for defining fitness functions for a Player in a given Lineup
+ *
+ * e.g. A string, such as <code>"+OBA -PIP"</code>, would produce a partial function whose output
+ * would be equivalent to the execution of following function:
+ *
+ *  <code>(a, b) ⇒ (b.stat(OBA) - a.stat(OBA)) + (a.stat(PIP) - b.stat(PIP))</code>
+ *
+ * Where <code>a</code> is a given Lineup and <code>b</code> is a Player at some index in <code>a</code>.
+ */
 object FitnessSpecificationParser extends RegexParsers
 {
   private case class Token(sign: String, statistic: Statistic.Value)
@@ -21,7 +31,7 @@ object FitnessSpecificationParser extends RegexParsers
     case sign ~ statistic ⇒ Token(sign, statistic)
   }
 
-  private lazy val specification: Parser[(Lineup, Player) ⇒ Double] = (token +) ~ EOL ^^ {
+  private lazy val specification: Parser[(Lineup, Player) ⇒ Double] = (token *) ~ EOL ^^ {
     case tokens ~ _ ⇒
       val functions = tokens.map { case Token(sign, statistic) ⇒
         (lineup: Lineup, player: Player) ⇒ sign match {

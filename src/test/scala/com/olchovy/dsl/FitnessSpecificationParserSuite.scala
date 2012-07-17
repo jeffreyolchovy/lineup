@@ -7,6 +7,11 @@ class FitnessSpecificationParserSuite extends FunSuite
 {
   private def parse(string: String) = FitnessSpecificationParser(string)
 
+  test("Parse empty string (no-op)") {
+    val string = ""
+    parse(string)
+  }
+
   test("Parse valid string with one statistic") {
     val string = "+OBA"
     parse(string)

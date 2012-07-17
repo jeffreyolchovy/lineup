@@ -13,7 +13,7 @@ case class Lineup(players: Seq[Player])
 
   override def equals(that: Any): Boolean = that match {
     case lineup: Lineup ⇒ players == lineup.players
-    case _ => false
+    case _ ⇒ false
   }
 
   override def hashCode = players.hashCode
