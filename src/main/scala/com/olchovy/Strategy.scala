@@ -7,6 +7,13 @@ import util.Random
 import com.olchovy.domain._, Statistic._
 
 
+/**
+ * The base trait of the genetic algorithm
+ *
+ * A Strategy defines the behaviors of the algorithm's
+ * initialization, selection, and reproduction (mutation and crossover) procedures
+ * alongside the definition of the main fitness function.
+ */
 trait Strategy
 {
   val LINEUP_SIZE: Int
