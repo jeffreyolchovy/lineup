@@ -1,0 +1,11 @@
+$ git clone https://github.com/jeffreyolchovy/lineup.git
+$ cd lineup
+
+Run the CLI:
+$ ./sbt run '--strategy filename [--players filename] [--lineup filename]' 
+
+Run an embedded web server:
+$ ./sbt container:start
+
+Package as a WAR:
+$ ./sbt package
