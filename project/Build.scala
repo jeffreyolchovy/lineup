@@ -19,10 +19,10 @@ object Build extends sbt.Build
       scalacOptions := Seq("-deprecation", "-encoding", "utf8"),
       resolvers     ++= Dependencies.resolutionRepos,
       libraryDependencies ++=
-        compile(akkaActor, sprayServer, sprayJson) ++
+        compile(akkaActor, akkaSlf4j, sprayServer, sprayJson) ++
         test(specs2, scalatest) ++
         runtime(slf4j, logback) ++
-        container(jettyWebApp, akkaSlf4j, slf4j, logback)
+        container(jettyWebApp, slf4j, logback)
     )
 }
 
