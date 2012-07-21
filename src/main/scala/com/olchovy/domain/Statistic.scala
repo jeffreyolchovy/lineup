@@ -14,7 +14,6 @@ object Statistic extends Enumeration
   ,   BB      // walks
   ,   SO      // strike outs
   ,   SF      // sacrifice fly-outs
-  ,   E       // errors
   ,   AVG     // batting average
   ,   SLG     // slugging average
   ,   OBA     // on-base average
