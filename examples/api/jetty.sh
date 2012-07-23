@@ -1,15 +1,10 @@
 #!/bin/bash
 
-PROJECT_ROOT='../..'
-PROJECT_EXAMPLES='..'
-PROJECT_API_EXAMPLES=$(pwd)
-PROJECT_VERSION='0.1.0'
-
 JETTY_VERSION='7.6.5.v20120716'
 
 install() {
   if [ -d "jetty" ] && [ "`cat jetty/VERSION`" == $JETTY_VERSION ]; then
-    echo 'Jetty already installed'
+    echo 'Jetty is already installed, skipping installation.'
   else
     echo "Installing Jetty ${JETTY_VERSION}"
 
@@ -30,11 +25,9 @@ install() {
   fi
 }
 
-build() {
-  cd $PROJECT_ROOT && sbt package && cd $PROJECT_API_EXAMPLES
-}
-
 start() {
+  local WAR=$1
+
   if [ -L jetty/webapps ]; then
     rm jetty/webapps
   else
@@ -43,13 +36,13 @@ start() {
 
   mkdir jetty/webapps
 
-  cp "${PROJECT_ROOT}/target/scala-2.9.1/lineup_2.9.1-${PROJECT_VERSION}.war" jetty/webapps/ROOT.war
+  cp $WAR jetty/webapps/ROOT.war
 
   cd jetty
   CMD="java -jar start.jar"
   nohup $CMD &> server.log &
   echo $! > jetty.pid
-  cd $PROJECT_API_EXAMPLES
+  cd ..
 }
 
 stop() {
