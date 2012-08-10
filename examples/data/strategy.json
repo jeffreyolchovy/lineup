@@ -1,6 +1,6 @@
 { "initial_population_size"   : 2500
-, "initial_fitness_threshold" : 1
-, "maximum_fitness_threshold" : 4
+, "initial_fitness_threshold" : 0.5
+, "maximum_fitness_threshold" : 3.5
 , "maximum_generations"       : 100
 , "fitness_specification"     : 
   [ "+OBA +BB/AB -PIP -HR/H"

@@ -5,7 +5,8 @@ Run the CLI:
 $ ./sbt run '--strategy filename [--players filename] [--lineup filename]' 
 
 Run an embedded web server:
-$ ./sbt container:start
+$ ./sbt
+> container:start
 
 Package as a WAR:
 $ ./sbt package
