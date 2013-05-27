@@ -1,15 +1,14 @@
 #!/bin/bash
 
-PROJECT_ROOT='../..'
+DIR=$(cd $(dirname ${BASH_SOURCE[0]}) && pwd)
+PROJECT_ROOT="$DIR/../.."
+DATA_DIR="$DIR/../data"
 
-cd $PROJECT_ROOT
+pushd $PROJECT_ROOT &> /dev/null
 
-./sbt "run
-  --strategy examples/data/strategy.json
-  --players examples/data/players.json"
+./sbt "run --strategy $DATA_DIR/strategy.json --players $DATA_DIR/players.json"
+./sbt "run --strategy $DATA_DIR/strategy.json --lineup $DATA_DIR/lineup.json"
 
-./sbt "run
-  --strategy examples/data/strategy.json
-  --lineup examples/data/lineup.json"
+popd &> /dev/null
 
 exit 0

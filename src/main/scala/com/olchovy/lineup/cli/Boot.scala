@@ -1,98 +1,156 @@
 package com.olchovy.lineup.cli
 
-import util.Random
+import java.io.File
+import scala.io.Source
+import scala.util.Random
+import cc.spray.json.{JsonParser, RootJsonFormat}
+import com.olchovy.lineup.api.RestService
 import com.olchovy.lineup.domain._
 import com.olchovy.lineup.io._
-import com.olchovy.lineup.{Strategy, DefaultBaseballStrategy, DefaultSoftballStrategy}
 
+object Boot {
 
-object Boot
-{
   type Options = Map[Symbol, Any]
 
   def main(args: Array[String]) {
-    val usage = "Usage: " + getClass.getName + " --strategy filename [--players filename] [--lineup filename]"
+    val usage =
+      """
+      |usage: %s [options]
+      |
+      |options:
+      | --api         run an embedded REST API server
+      | --strategy <path> [--players <path>] [--lineup <path>]
+      |               generate lineups or calculate fitness score
+      """.stripMargin.trim.format(getClass.getSimpleName)
 
     try {
-      if(args.size == 0) throw new RuntimeException(usage)
+      if (args.isEmpty)
+        throw new RuntimeException(usage)
 
       val options = parseOptions(args)
 
       try {
-        assert(options.contains('strategy))
+        assert(options.contains('api) || options.contains('strategy))
       } catch {
-        case _ ⇒ throw new RuntimeException("--strategy is a required argument\n\n" + usage)
+        case _ ⇒ throw new RuntimeException("one of --api, --strategy is a required as an argument\n\n" + usage)
       }
+
+      if (options.contains('api))
+        RestService.run()
+      else {
+        val strategy = options('strategy).asInstanceOf[Strategy]
+
+        try {
+          assert(options.contains('players) || options.contains('lineup))
+        } catch {
+          case _ ⇒ throw new RuntimeException("one of --players, --lineup is required as an argument\n\n" + usage)
+        }
+
+        if (options.contains('players)) {
+          val players = options('players).asInstanceOf[Seq[Player]]
+          val lineups = strategy.execute(players)
+          println("%d solution(s) found".format(lineups.size))
+          printLineup(strategy, lineups.toSeq: _*)
+        }
+
+        if (options.contains('lineup)) {
+          val lineup = options('lineup).asInstanceOf[Lineup]
+          printLineup(strategy, lineup)
+        }
+
+        sys.exit(0)
+      }
+    } catch {
+      case e: RuntimeException ⇒
+        println(e.getMessage)
+        sys.exit(1)
+
+      case e: Exception ⇒
+        e.printStackTrace
+        sys.exit(2)
+    }
+  }
+  
+  def parseOptions(args: Seq[String]): Options = {
+    def helper(opts: Options, args: List[String]): Options = args match {
+      case Nil ⇒ opts
+
+      case "--api" :: tail ⇒
+        helper(opts ++ Map('api → true), tail)
+
+      case "--strategy" :: "softball" :: tail ⇒
+        helper(opts ++ Map('strategy → DefaultSoftballStrategy), tail)
+
+      case "--strategy" :: "baseball" :: tail ⇒
+        helper(opts ++ Map('strategy → DefaultBaseballStrategy), tail)
+
+      case "--strategy" :: path :: tail ⇒
+        parseStrategyFile(new File(path)).fold(
+          failure => throw failure,
+          success => helper(opts ++ Map('strategy → success), tail)
+        )
+
+      case "--players" :: _ :: tail if opts.contains('lineup) ⇒
+        throw new RuntimeException("'players' and 'lineup' are mutually exclusive options")
+
+      case "--players" :: path :: tail ⇒
+        parseLineupFile(new File(path)).fold(
+          failure => throw failure,
+          success => helper(opts ++ Map('players → success.players), tail)
+        )
+
+      case "--lineup" :: _ :: tail if opts.contains('players) ⇒
+        throw new RuntimeException("'lineup' and 'players' are mutually exclusive options")
+
+      case "--lineup" :: path :: tail ⇒
+        parseLineupFile(new File(path)).fold(
+          failure => throw failure,
+          success => helper(opts ++ Map('lineup → success), tail)
+        )
+
+      case option :: _ ⇒ throw new RuntimeException("Unknown option: " + option)
+    }
+
+    helper(Map(), args.toList)
+  }
+
+  def parseStrategyFile(file: File) = parseJsonFile(StrategyJsonFormat)(file)
+
+  def parseLineupFile(file: File) = parseJsonFile(LineupJsonFormat)(file)
+
+  def parseJsonFile[A](jsonFormat: RootJsonFormat[A])(file: File): Either[Exception, A] = {
+    if (!file.exists)
+      Left(new RuntimeException("File does not exist: " + file.getAbsolutePath))
+    else {
+      val contents = Source.fromFile(file.getAbsolutePath).mkString
 
       try {
-        assert(options.contains('players) || options.contains('lineup))
+        Right(jsonFormat.read(JsonParser(contents)))
       } catch {
-        case _ ⇒ throw new RuntimeException("one of --players, --lineup is required as an argument\n\n" + usage)
+        case e: Exception ⇒ Left(e)
       }
-
-      val strategy = options('strategy).asInstanceOf[Strategy]
-
-      if(options.contains('players)) {
-        val players = options('players).asInstanceOf[Seq[Player]]
-        val solutions = strategy.execute(players)
-
-        println("SOLUTIONS FOUND: %s\n".format(solutions.size))
-
-        solutions.foreach { lineup ⇒
-          println(lineup)
-          println("----------------------------------------")
-          println("HASHCODE: " + lineup.hashCode)
-          println("----------------------------------------")
-          println("SCORE: " + strategy.fitness(lineup))
-          println("========================================")
-          println("")
-        }
-      }
-
-      if(options.contains('lineup)) {
-        val lineup = options('lineup).asInstanceOf[Lineup]
-        println(lineup)
-        println("----------------------------------------")
-        println("HASHCODE: " + lineup.hashCode)
-        println("----------------------------------------")
-        println("SCORE: " + strategy.fitness(lineup))
-        println("========================================")
-        println("")
-      }
-
-      sys.exit(0)
-    } catch {
-      case e: Exception ⇒ println(e.getMessage); sys.exit(1)
     }
   }
 
-  private def parseOptions(args: Seq[String]): Options = nextOption(Map(), args.toList)
-
-  private def nextOption(opts: Options, args: List[String]): Options = args match {
-    case Nil ⇒ opts
-
-    case "--strategy" :: "softball" :: tail ⇒
-      nextOption(opts ++ Map('strategy → new DefaultSoftballStrategy), tail)
-
-    case "--strategy" :: "baseball" :: tail ⇒
-      nextOption(opts ++ Map('strategy → new DefaultBaseballStrategy), tail)
-
-    case "--strategy" :: filename :: tail ⇒
-      nextOption(opts ++ Map('strategy → StrategyJsonFormat.fromFile(filename)), tail)
-
-    case "--players" :: filename :: tail if opts.contains('lineup) ⇒
-      throw new RuntimeException("'players' and 'lineup' are mutually exclusive options")
-
-    case "--players" :: filename :: tail ⇒
-      nextOption(opts ++ Map('players → LineupJsonFormat.fromFile(filename).players), tail)
-
-    case "--lineup" :: filename :: tail if opts.contains('players) ⇒
-      throw new RuntimeException("'lineup' and 'players' are mutually exclusive options")
-
-    case "--lineup" :: filename :: tail ⇒
-      nextOption(opts ++ Map('lineup → LineupJsonFormat.fromFile(filename)), tail)
-
-    case option :: _ ⇒ throw new RuntimeException("Unknown option: " + option)
+  def printLineup(strategy: Strategy, lineups: Lineup*) {
+    lineups.foreach { lineup ⇒
+      println(
+        """
+        |%s
+        |----------------------------------------
+        |hashcode: %s
+        |----------------------------------------
+        |score: %f
+        |========================================
+        """
+        .stripMargin
+        .trim
+        .format(
+          lineup,
+          lineup.hashCode,
+          strategy.fitness(lineup)
+        )
+      )
+    }
   }
 }
-

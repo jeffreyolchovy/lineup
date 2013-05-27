@@ -3,7 +3,6 @@ package com.olchovy.lineup.domain
 import org.scalatest.FunSuite
 import org.scalatest.BeforeAndAfter
 
-
 class LineupSuite extends FunSuite with BeforeAndAfter
 {
   import Statistic._
@@ -26,4 +25,3 @@ class LineupSuite extends FunSuite with BeforeAndAfter
     assert(lineup.stat(AVG) == ((3.0 / 10.0) + (5.0 / 12.0)) / 2)
   }
 }
-

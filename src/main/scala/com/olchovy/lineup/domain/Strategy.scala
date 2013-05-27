@@ -1,11 +1,9 @@
-package com.olchovy.lineup
+package com.olchovy.lineup.domain
 
 import annotation.tailrec
 import collection.mutable
 import math.{ceil, min}
 import util.Random
-import com.olchovy.lineup.domain._
-
 
 /**
  * The base trait of the genetic algorithm
@@ -16,22 +14,23 @@ import com.olchovy.lineup.domain._
  */
 trait Strategy
 {
-  val LINEUP_SIZE: Int
+  val lineupSize: Int
 
-  val INITIAL_POPULATION_SIZE: Int
+  val initPopulationSize: Int
 
-  val INITIAL_FITNESS_THRESHOLD: Double
+  val initFitnessThreshold: Double
 
-  val MAX_FITNESS_THRESHOLD: Double
+  val maxFitnessThreshold: Double
 
-  val MAX_GENERATIONS: Int
+  val maxGenerations: Int
 
   def fitness(lineup: Lineup): Double
 
   def execute(players: Seq[Player]): Set[Lineup] = execute(initialize(players))
 
-  @tailrec private def execute(lineups: Set[Lineup], generation: Int = 0): Set[Lineup] = {
-    if(generation < MAX_GENERATIONS) {
+  @tailrec
+  private def execute(lineups: Set[Lineup], generation: Int = 0): Set[Lineup] = {
+    if(generation < maxGenerations) {
       // calculate the fitness threshold that must be reached to retain the lineup
       val generationThreshold = threshold(generation)
 
@@ -70,12 +69,12 @@ trait Strategy
   }
 
   private def initialize(seed: Seq[Player]): Set[Lineup] = {
-    for(i ← 1 to INITIAL_POPULATION_SIZE) yield Lineup(Random.shuffle(seed).take(LINEUP_SIZE))
+    for (i ← 1 to initPopulationSize) yield Lineup(Random.shuffle(seed).take(lineupSize))
   }.toSet
 
   private def threshold(generation: Int) = generation match {
-    case 0 ⇒ INITIAL_FITNESS_THRESHOLD
-    case i ⇒ min(generation * 0.1, MAX_FITNESS_THRESHOLD)
+    case 0 ⇒ initFitnessThreshold
+    case i ⇒ min(generation * 0.1, maxFitnessThreshold)
   }
 
   private def crossover(lineup1: Lineup, lineup2: Lineup): (Lineup, Lineup) = {
@@ -87,15 +86,14 @@ trait Strategy
     val value1 = array1(i)
     val value2 = array2(i)
 
-    if(value1 == value2)
+    if (value1 == value2)
       crossover(lineup1, lineup2)
     else {
       val index1 = array1.indexOf(value2)
       val index2 = array2.indexOf(value1)
 
-      // lineups can not be recombinated reliably
-      // mutate each independently
-      if(index1 == -1 || index2 == -1)
+      // lineups can not be recombinated reliably, mutate each independently
+      if (index1 == -1 || index2 == -1)
         (mutate(lineup1), mutate(lineup2))
       else {
         array2(i) = value1
@@ -148,31 +146,31 @@ trait MemoizingStrategy
 
 abstract class DefaultStrategy extends Strategy with MemoizingStrategy
 {
-  val INITIAL_POPULATION_SIZE = DefaultStrategy.INITIAL_POPULATION_SIZE
+  val initPopulationSize = DefaultStrategy.InitPopulationSize
 
-  val INITIAL_FITNESS_THRESHOLD = DefaultStrategy.INITIAL_FITNESS_THRESHOLD
+  val initFitnessThreshold = DefaultStrategy.InitFitnessThreshold
 
-  val MAX_FITNESS_THRESHOLD = DefaultStrategy.MAX_FITNESS_THRESHOLD
+  val maxFitnessThreshold = DefaultStrategy.MaxFitnessThreshold
 
-  val MAX_GENERATIONS = DefaultStrategy.MAX_GENERATIONS
+  val maxGenerations = DefaultStrategy.MaxGenerations
 }
 
 object DefaultStrategy
 {
-  val INITIAL_POPULATION_SIZE = 2500
+  val InitPopulationSize = 2500
 
-  val INITIAL_FITNESS_THRESHOLD = 1.0
+  val InitFitnessThreshold = 1.0
 
-  val MAX_FITNESS_THRESHOLD = 4.0
+  val MaxFitnessThreshold = 4.0
 
-  val MAX_GENERATIONS = 100
+  val MaxGenerations = 100
 }
 
-class DefaultBaseballStrategy extends DefaultStrategy
+object DefaultBaseballStrategy extends DefaultStrategy
 {
   import Statistic._
 
-  val LINEUP_SIZE = 9
+  val lineupSize = 9
 
   protected def computeFitness(lineup: Lineup): Double = lineup.players.zipWithIndex.map {
     case (player, index) ⇒ index match {
@@ -225,11 +223,11 @@ class DefaultBaseballStrategy extends DefaultStrategy
   }.sum
 }
 
-class DefaultSoftballStrategy extends DefaultStrategy
+object DefaultSoftballStrategy extends DefaultStrategy
 {
   import Statistic._
 
-  val LINEUP_SIZE = 12
+  val lineupSize = 12
 
   protected def computeFitness(lineup: Lineup): Double = lineup.players.zipWithIndex.map {
     case (player, index) ⇒ index match {
@@ -281,4 +279,3 @@ class DefaultSoftballStrategy extends DefaultStrategy
     }
   }.sum
 }
-

@@ -4,8 +4,6 @@ import org.scalatest.FeatureSpec
 import org.scalatest.GivenWhenThen
 import cc.spray.json._, DefaultJsonProtocol._
 import com.olchovy.lineup.domain._
-import com.olchovy.lineup.{Strategy, DefaultStrategy, DefaultBaseballStrategy}
-
 
 class StrategyJsonFormatSpec extends FeatureSpec with GivenWhenThen
 {
@@ -14,12 +12,10 @@ class StrategyJsonFormatSpec extends FeatureSpec with GivenWhenThen
   feature("Strategy instances cannot be marshaled to JSON") {
     scenario("marshal a Strategy instance to JSON") {
       given("a Strategy instance") 
-      val strategy = new DefaultBaseballStrategy
-
       when("'write' is invoked on the StrategyJsonFormat")
       then("a SerializationException should be thrown")
       intercept[SerializationException] {
-        StrategyJsonFormat.write(strategy)
+        StrategyJsonFormat.write(DefaultBaseballStrategy)
       }
     }
   }
@@ -47,12 +43,11 @@ class StrategyJsonFormatSpec extends FeatureSpec with GivenWhenThen
       assert(strategy.isInstanceOf[Strategy])
 
       and("it should have the values present in the original JSON string")
-      assert(strategy.LINEUP_SIZE == 2)
-      assert(strategy.INITIAL_POPULATION_SIZE == 2500)
-      assert(strategy.INITIAL_FITNESS_THRESHOLD == 1.0)
-      assert(strategy.MAX_FITNESS_THRESHOLD == 4.0)
-      assert(strategy.MAX_GENERATIONS == 100)
+      assert(strategy.lineupSize == 2)
+      assert(strategy.initPopulationSize == 2500)
+      assert(strategy.initFitnessThreshold == 1.0)
+      assert(strategy.maxFitnessThreshold == 4.0)
+      assert(strategy.maxGenerations == 100)
     }
   }
 }
-

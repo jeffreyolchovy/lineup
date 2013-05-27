@@ -5,7 +5,6 @@ import org.scalatest.GivenWhenThen
 import cc.spray.json._, DefaultJsonProtocol._
 import com.olchovy.lineup.domain._
 
-
 class PlayerJsonFormatSpec extends FeatureSpec with GivenWhenThen
 {
   import Statistic._
@@ -59,4 +58,3 @@ class PlayerJsonFormatSpec extends FeatureSpec with GivenWhenThen
     }
   }
 }
-

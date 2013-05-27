@@ -1,29 +1,27 @@
 #!/bin/bash
 
-. ./jetty.sh
+# NOTE: currently requires api server running in separate process
 
-PROJECT_ROOT='../..'
-PROJECT_EXAMPLES='..'
-PROJECT_API_EXAMPLES=$(pwd)
-PROJECT_VERSION='0.1.0'
-SCALA_VERSION='2.9.1'
+DIR=$(cd $(dirname ${BASH_SOURCE[0]}) && pwd)
+PROJECT_ROOT="$DIR/../.."
+DATA_DIR="$DIR/../data"
 
-build() {
-  cd $PROJECT_ROOT && sbt package && cd $PROJECT_API_EXAMPLES
-}
+pushd $PROJECT_ROOT &> /dev/null
 
-install && build
-start "${PROJECT_ROOT}/target/scala-${SCALA_VERSION}/lineup_${SCALA_VERSION}-${PROJECT_VERSION}.war" && sleep 10
+response=$(curl -sX POST \
+ -H 'Content-type:application/json' \
+ -d "{\"strategy\":$(cat $DATA_DIR/strategy.json), \"players\":$(cat $DATA_DIR/players.json)}" \
+ 'http://localhost:8080/lineups')
 
-curl -X POST \
-     -H 'Content-type:application/json' \
-     -d "{\"strategy\":$(cat ../data/strategy.json), \"players\":$(cat ../data/players.json)}" \
-     'http://localhost:8080/lineup'
+echo "$response"
 
-curl -X POST \
-     -H 'Content-type:application/json' \
-     -d "{\"strategy\":$(cat ../data/strategy.json), \"players\":$(cat ../data/lineup.json)}" \
-     'http://localhost:8080/fitness'
+response=$(curl -sX POST \
+ -H 'Content-type:application/json' \
+ -d "{\"strategy\":$(cat $DATA_DIR/strategy.json), \"players\":$(cat $DATA_DIR/lineup.json)}" \
+ 'http://localhost:8080/fitness')
 
-stop
+echo "$response"
+
+popd &> /dev/null
+
 exit 0 

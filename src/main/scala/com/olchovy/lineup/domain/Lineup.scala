@@ -2,7 +2,6 @@ package com.olchovy.lineup.domain
 
 import Statistic._
 
-
 case class Lineup(players: Seq[Player])
 {
   def size = players.size

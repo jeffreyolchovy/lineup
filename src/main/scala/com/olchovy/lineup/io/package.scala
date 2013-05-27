@@ -1,34 +1,13 @@
 package com.olchovy.lineup
 
 import cc.spray.json._
+import cc.spray.json.DefaultJsonProtocol._
 import com.olchovy.lineup.domain._
+import com.olchovy.lineup.dsl._
 
+package object io {
 
-package object io
-{
-  import DefaultJsonProtocol._
-
-  private[io] trait JsonReaderUtils[A]
-  {
-    this: JsonReader[A] ⇒ 
-
-    import java.io.File
-    import scala.io.Source
-
-    def fromString(string: String): A = read(JsonParser(string))
-
-    def fromFile(filename: String): A = {
-      val filepath = if(filename.startsWith("/")) filename else absolutePath(filename)
-      fromString(Source.fromFile(filepath).mkString)
-    }
-
-    private def absolutePath(filename: String): String = {
-      "%s%s%s".format(System.getProperty("user.dir"), File.separator, filename)
-    }
-  }
-
-  implicit object PlayerJsonFormat extends RootJsonFormat[Player]
-  {
+  implicit object PlayerJsonFormat extends RootJsonFormat[Player] {
     def read(json: JsValue): Player = json match {
       case obj: JsObject ⇒
         val name = obj.fields("name").convertTo[String]
@@ -53,8 +32,7 @@ package object io
     )
   }
 
-  implicit object LineupJsonFormat extends RootJsonFormat[Lineup] with JsonReaderUtils[Lineup]
-  {
+  implicit object LineupJsonFormat extends RootJsonFormat[Lineup] {
     def read(json: JsValue): Lineup = json match {
       case array: JsArray ⇒ Lineup(array.elements.map(PlayerJsonFormat.read _))
       case _ ⇒ deserializationError("Array expected")
@@ -63,32 +41,29 @@ package object io
     def write(lineup: Lineup): JsValue = JsArray(lineup.players.map(PlayerJsonFormat.write _): _*)
   }
 
-  implicit object StrategyJsonFormat extends RootJsonFormat[Strategy] with JsonReaderUtils[Strategy]
-  {
-    import com.olchovy.lineup.dsl._
-
+  implicit object StrategyJsonFormat extends RootJsonFormat[Strategy] {
     def read(json: JsValue): Strategy = json match {
       case obj: JsObject ⇒ new Strategy with MemoizingStrategy {
-        lazy val LINEUP_SIZE = fitnessSpecification.size
+        lazy val lineupSize = fitnessSpecification.size
 
-        val INITIAL_POPULATION_SIZE = {
+        val initPopulationSize = {
           val value_? = obj.fields.get("initial_population_size")
-          value_?.map(_.convertTo[Int]).getOrElse(DefaultStrategy.INITIAL_POPULATION_SIZE)
+          value_?.map(_.convertTo[Int]).getOrElse(DefaultStrategy.InitPopulationSize)
         }
 
-        val INITIAL_FITNESS_THRESHOLD = {
+        val initFitnessThreshold = {
           val value_? = obj.fields.get("initial_fitness_threshold")
-          value_?.map(_.convertTo[Double]).getOrElse(DefaultStrategy.INITIAL_FITNESS_THRESHOLD)
+          value_?.map(_.convertTo[Double]).getOrElse(DefaultStrategy.InitFitnessThreshold)
         }
 
-        val MAX_FITNESS_THRESHOLD = {
+        val maxFitnessThreshold = {
           val value_? = obj.fields.get("maximum_fitness_threshold")
-          value_?.map(_.convertTo[Double]).getOrElse(DefaultStrategy.MAX_FITNESS_THRESHOLD)
+          value_?.map(_.convertTo[Double]).getOrElse(DefaultStrategy.MaxFitnessThreshold)
         }
 
-        val MAX_GENERATIONS = {
+        val maxGenerations = {
           val value_? = obj.fields.get("maximum_generations")
-          value_?.map(_.convertTo[Int]).getOrElse(DefaultStrategy.MAX_GENERATIONS)
+          value_?.map(_.convertTo[Int]).getOrElse(DefaultStrategy.MaxGenerations)
         }
 
         protected def computeFitness(lineup: Lineup): Double = lineup.players.zipWithIndex.map {
@@ -113,4 +88,3 @@ package object io
     def write(strategy: Strategy): JsValue = serializationError("Strategy is read-only")
   }
 }
-

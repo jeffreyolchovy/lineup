@@ -1,6 +1,5 @@
 package com.olchovy.lineup.domain
 
-
 object Statistic extends Enumeration
 {
   val AB      // at-bats

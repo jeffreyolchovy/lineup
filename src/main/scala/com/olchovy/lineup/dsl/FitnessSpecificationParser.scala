@@ -4,12 +4,11 @@ import util.matching.Regex
 import util.parsing.combinator.RegexParsers
 import com.olchovy.lineup.domain._
 
-
 /**
  * A grammar for defining fitness functions for a Player in a given Lineup
  *
  * e.g. A string, such as <code>"+OBA -PIP"</code>, would produce a partial function whose output
- * would be equivalent to the execution of following function:
+ * would be equivalent to the execution of the following function:
  *
  *  <code>(a, b) ⇒ (b.stat(OBA) - a.stat(OBA)) + (a.stat(PIP) - b.stat(PIP))</code>
  *
@@ -48,4 +47,3 @@ object FitnessSpecificationParser extends RegexParsers
     case e: NoSuccess ⇒ throw new RuntimeException(e.toString)
   }
 }
-

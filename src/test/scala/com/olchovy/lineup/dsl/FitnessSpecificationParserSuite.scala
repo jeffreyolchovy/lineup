@@ -2,7 +2,6 @@ package com.olchovy.lineup.dsl
 
 import org.scalatest.FunSuite
 
-
 class FitnessSpecificationParserSuite extends FunSuite
 {
   private def parse(string: String) = FitnessSpecificationParser(string)
@@ -53,4 +52,3 @@ class FitnessSpecificationParserSuite extends FunSuite
     }
   }
 }
-

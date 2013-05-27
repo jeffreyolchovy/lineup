@@ -2,7 +2,6 @@ package com.olchovy.lineup.domain
 
 import Statistic._
 
-
 class Player private(val name: String, private val _stats: Map[Statistic.Value, Double])
 {
   lazy val stats: Map[Statistic.Value, Double] = _stats ++ Map(
