@@ -1,6 +1,6 @@
 [
   { "name"  : "Cano, R"
-  , "stats" : 
+  , "stats" :
     { "AB"  : 361
     , "R"   : 63
     , "H"   : 116
@@ -14,7 +14,7 @@
     }
   }
 , { "name"  : "Granderson, C"
-  , "stats" : 
+  , "stats" :
     { "AB"  : 354
     , "R"   : 65
     , "H"   : 88
@@ -28,7 +28,7 @@
     }
   }
 , { "name"  : "Teixeira, M"
-  , "stats" : 
+  , "stats" :
     { "AB"  : 324
     , "R"   : 54
     , "H"   : 83
@@ -42,7 +42,7 @@
     }
   }
 , { "name"  : "Swisher, N"
-  , "stats" : 
+  , "stats" :
     { "AB"  : 302
     , "R"   : 40
     , "H"   : 78
@@ -56,7 +56,7 @@
     }
   }
 , { "name"  : "Jeter, D"
-  , "stats" : 
+  , "stats" :
     { "AB"  : 391
     , "R"   : 53
     , "H"   : 122
@@ -70,7 +70,7 @@
     }
   }
 , { "name"  : "Martin, R"
-  , "stats" : 
+  , "stats" :
     { "AB"  : 225
     , "R"   : 23
     , "H"   : 41
@@ -84,7 +84,7 @@
     }
   }
 , { "name"  : "Rodriguez, A"
-  , "stats" : 
+  , "stats" :
     { "AB"  : 337
     , "R"   : 51
     , "H"   : 91
@@ -98,7 +98,7 @@
     }
   }
 , { "name"  : "Ibanez, R"
-  , "stats" : 
+  , "stats" :
     { "AB"  : 236
     , "R"   : 27
     , "H"   : 57
@@ -112,7 +112,7 @@
     }
   }
 , { "name"  : "Jones, A"
-  , "stats" : 
+  , "stats" :
     { "AB"  : 142
     , "R"   : 17
     , "H"   : 33
@@ -126,7 +126,7 @@
     }
   }
 , { "name"  : "Stewart, C"
-  , "stats" : 
+  , "stats" :
     { "AB"  : 91
     , "R"   : 10
     , "H"   : 23
@@ -137,6 +137,6 @@
     , "SF"  : 2
     , "BB"  : 2
     , "SO"  : 15
-    } 
+    }
   }
 ]

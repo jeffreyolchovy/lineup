@@ -1,5 +1,0 @@
----
-- description: "replace spray http server with finagle http server"
-  status: complete
-- "add assembly task"
-...

@@ -1,0 +1,7 @@
+span.index #{data.index + 1}.
+span.input
+  - if(!data.specs)
+    input(type="text", name="spec_#{data.index}")
+  - else
+    input(type="text", name="spec_#{data.index}" value="#{data.specs[index]}")
+

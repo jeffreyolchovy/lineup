@@ -1,0 +1,135 @@
+@import 'nib'
+
+.token-input-list
+  overflow hidden 
+  height auto !important
+  height 1%
+  width 100%
+  cursor text
+  font-family 'Menlo', monospace
+  font-size 85%
+  min-height 1px
+  z-index 999
+  margin 0
+  padding 8px 0
+  list-style-type none
+  clear left
+  line-height 32px
+
+  li input
+    width 1em
+    border none
+    -webkit-appearance caret
+    font-size 15px
+    color #777
+    vertical-align middle
+
+  tester
+    font-family 'Lucida Grande'
+    font-weight 400
+    font-size 15px
+    line-height 19px
+    color #777
+
+.token-input-token
+  background-image linear-gradient(top, #fff4, #fff0)
+  overflow hidden
+  height auto !important
+  height 16px
+  line-height 16px
+  margin 3px 0
+  margin-right 0.75em
+  padding 0.25em
+  cursor pointer
+  border-radius 5px
+  float left
+  white-space nowrap
+  text-shadow 0 1px 0 #fff8
+  box-shadow inset 0 1px 0 #fff4, 0 1px 1px #0002, -1px 2px 5px #0003
+
+  &.gt
+    background-color #c4df9b
+    border 1px solid #598527
+    color #314121
+
+    .icon, .close
+      color #598527
+
+  &.lt
+    background-color #ee9b9f
+    border 1px solid darkred
+    color #412131
+
+    .icon, .close
+      color darkred
+
+  p
+    display inline
+    padding 0
+    margin 0
+
+  .text
+    font-family monospace
+    margin 0 0.25em
+
+  .icon, .close
+    font-weight bold
+
+  .close
+    cursor pointer
+
+.token-input-selected-token
+  box-shadow inset 0 1px 2px #0002
+
+  &.gt
+    background-color #b3d67e
+
+  &.lt
+    background-color #de8b8f
+
+.token-input-input-token
+  float left
+  margin 0
+  padding 0
+  list-style-type none
+
+.token-input-dropdown
+  position absolute
+  background-color #fff
+  overflow hidden
+  border-left 1px solid #aaa
+  border-right 1px solid #aaa
+  border-bottom 1px solid #aaa
+  cursor default
+  font-family 'Helvetica Neue', sans-serif
+  font-size 85%
+  z-index 1
+  line-height 20px
+
+  p
+    padding 0.25em 0.5em
+    color #777
+
+  ul
+    margin 0
+    padding 0
+
+    li
+      background-color #fff
+      padding 0.25em 0.5em
+      margin 0
+      list-style-type none
+
+      &.token-input-dropdown-item
+        background-color #fff
+
+      &.token-input-dropdown-item2
+        background-color #fff
+
+      em
+        font-weight bold
+        font-style normal
+
+      &.token-input-selected-dropdown-item
+        background-color #3b5998
+        color #fff

@@ -1,0 +1,72 @@
+.name
+  p.input-wrapper
+    - if(!data.name)
+      input(type="text", name="player_#{data.index}_name", placeholder="Player Name")
+    - else
+      input(type="text", name="player_#{data.index}_name", placeholder="Player Name", value="#{data.name}")
+
+ul.stats
+  - if(!data.stats)
+    li.input-wrapper
+      span AB
+      input(type="text", name="player_#{data.index}_AB")
+    li.input-wrapper
+      span H
+      input(type="text", name="player_#{data.index}_H")
+    li.input-wrapper
+      span 2B
+      input(type="text", name="player_#{data.index}_2B")
+    li.input-wrapper
+      span 3B
+      input(type="text", name="player_#{data.index}_3B")
+    li.input-wrapper
+      span HR
+      input(type="text", name="player_#{data.index}_HR")
+    li.input-wrapper
+      span RBI
+      input(type="text", name="player_#{data.index}_RBI")
+    li.input-wrapper
+      span R
+      input(type="text", name="player_#{data.index}_R")
+    li.input-wrapper
+      span BB
+      input(type="text", name="player_#{data.index}_BB")
+    li.input-wrapper
+      span SO
+      input(type="text", name="player_#{data.index}_SO")
+    li.input-wrapper
+      span SF
+      input(type="text", name="player_#{data.index}_SF")
+
+  - else
+    li.input-wrapper
+      span AB
+      input(type="text", name="player_#{data.index}_AB", value="#{data.stats.AB}")
+    li.input-wrapper
+      span H
+      input(type="text", name="player_#{data.index}_H", value="#{data.stats.H}")
+    li.input-wrapper
+      span 2B
+      input(type="text", name="player_#{data.index}_2B", value="#{data.stats['2B']}")
+    li.input-wrapper
+      span 3B
+      input(type="text", name="player_#{data.index}_3B", value="#{data.stats['3B']}")
+    li.input-wrapper
+      span HR
+      input(type="text", name="player_#{data.index}_HR", value="#{data.stats.HR}")
+    li.input-wrapper
+      span RBI
+      input(type="text", name="player_#{data.index}_RBI", value="#{data.stats.RBI}")
+    li.input-wrapper
+      span R
+      input(type="text", name="player_#{data.index}_R", value="#{data.stats.R}")
+    li.input-wrapper
+      span BB
+      input(type="text", name="player_#{data.index}_BB", value="#{data.stats.BB}")
+    li.input-wrapper
+      span SO
+      input(type="text", name="player_#{data.index}_SO", value="#{data.stats.SO}")
+    li.input-wrapper
+      span SF
+      input(type="text", name="player_#{data.index}_SF", value="#{data.stats.SF}")
+

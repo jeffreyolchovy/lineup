@@ -16,12 +16,3 @@ Lineups then undergo independent mutation or are recombinated with other lineups
 This process is repeated until some maximum number of generations has been reached.
 
 The solution set of high-scoring lineups is the return value of the algorithm.
-
-Installation
-------------
-See INSTALL
-
-Usage
------
-For API and CLI usage examples, browse the /examples/api and /examples/cli directories, respectively.
-
