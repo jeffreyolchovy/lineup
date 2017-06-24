@@ -24,6 +24,7 @@ val common = (project in file("common"))
   .settings(
     libraryDependencies ++= Seq(
       "org.scala-lang.modules" %% "scala-parser-combinators" % "1.0.6",
+      "org.json4s" %% "json4s-native" % "3.5.2",
       "org.scalatest" %% "scalatest"  % "3.0.1" % Test,
       "ch.qos.logback" % "logback-classic" % "1.2.3" % Test
     )
