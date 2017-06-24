@@ -6,6 +6,10 @@ import sbt.Keys._
 object GuiPlugin extends AutoPlugin {
 
   object autoImport {
+    val npmExecutable = settingKey[File]("Location of npm executable")
+    val npmInstall    = taskKey[Unit]("Install the necessary NPM packages")
+    val npmUpdate     = taskKey[Unit]("Update the required NPM packages")
+
     val nodeModulesDirectory    = settingKey[File]("Location of node_modules directory")
     val nodeModulesBinDirectory = settingKey[File]("Location of installed, executable npm packages")
 
@@ -24,6 +28,31 @@ object GuiPlugin extends AutoPlugin {
   override def projectSettings = Seq(
     nodeModulesDirectory := baseDirectory.value / "node_modules",
     nodeModulesBinDirectory := nodeModulesDirectory.value / ".bin",
+
+    npmExecutable := {
+      val log = sLog.value
+      val output = Process("which npm") !! log
+      file(output)
+    },
+    npmInstall := {
+      val log = streams.value.log
+      val bin = npmExecutable.value
+      val etc = baseDirectory.value / "etc"
+      val prefix = nodeModulesDirectory.value.getParentFile
+      Process(s"$bin install $etc --no-shrinkwrap --prefix $prefix") ! log
+    },
+    /*
+    npmUpdate := {
+      val nodeModules = nodeModulesDirectory.value
+      val log = streams.value.log
+      val bin = npmExecutable.value
+      val etc = baseDirectory.value / "etc"
+      val prefix = nodeModules.getParentFile
+      if (nodeModules.exists) {
+        Process(s"$bin install $etc --no-shrinkwrap --prefix $prefix") ! log
+      }
+    },
+    */
 
     coffeeSourceDirectory := (sourceDirectory in Compile).value / "coffee",
     stylusSourceDirectory := (sourceDirectory in Compile).value / "styl",
@@ -44,6 +73,7 @@ object GuiPlugin extends AutoPlugin {
       "step3.coffee"
     ).map(coffeeSourceDirectory.value / _),
 
+    update := update.dependsOn(npmInstall).value,
     resourceGenerators in Compile ++= Seq(
       // generate js from coffeescript sources
       Def.task {
@@ -67,7 +97,7 @@ object GuiPlugin extends AutoPlugin {
         (jadeSourceDirectory.value * "*.jade")
           .get
           .foreach { template =>
-            log.info(s"Compiling Jade template $template to client-side JavaScript code")
+            log.debug(s"Compiling Jade template $template to client-side JavaScript code")
             val (name, _) = IO.split(template.getName)
             val javascript = Process(s"$bin/jade -c -D") #< template !! log
             buffer += s"LineupGui.templates['$name'] = (function(){return $javascript;})();"

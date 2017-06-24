@@ -14,17 +14,17 @@ object BaseballFitnessFunction extends (Lineup => Double) {
           (lineup.stats(HOMERUNS_PER_HIT) - player.stats(HOMERUNS_PER_HIT))
         case 1 ⇒ 
           (player.stats(SLUGGING_PCT) - lineup.stats(SLUGGING_PCT)) +
-          (player.stats(ON_BASE_AVG) - lineup.stats(ON_BASE_AVG)) + 
+          (player.stats(ON_BASE_AVG) - lineup.stats(ON_BASE_AVG)) +
           (player.stats(WALKS_PER_AT_BAT) - lineup.stats(WALKS_PER_AT_BAT)) +
           (lineup.stats(PUT_IN_PLAY_PCT) - player.stats(PUT_IN_PLAY_PCT)) +
-          (lineup.stats(EXTRA_BASE_AVG) - player.stats(EXTRA_BASE_AVG))
+          (lineup.stats(ISOLATED_POWER) - player.stats(ISOLATED_POWER))
         case 2 ⇒
           (player.stats(SLUGGING_PCT) - lineup.stats(SLUGGING_PCT)) +
           (player.stats(PUT_IN_PLAY_PCT) - lineup.stats(PUT_IN_PLAY_PCT)) +
           (player.stats(WALKS_PER_AT_BAT) - lineup.stats(WALKS_PER_AT_BAT))
         case 3 ⇒
           (player.stats(SLUGGING_PCT) - lineup.stats(SLUGGING_PCT)) +
-          (player.stats(ON_BASE_AVG) - lineup.stats(ON_BASE_AVG)) + 
+          (player.stats(ON_BASE_AVG) - lineup.stats(ON_BASE_AVG)) +
           (player.stats(HOMERUNS_PER_HIT) - lineup.stats(HOMERUNS_PER_HIT))
         case 4 ⇒
           (player.stats(SLUGGING_PCT) - lineup.stats(SLUGGING_PCT)) +

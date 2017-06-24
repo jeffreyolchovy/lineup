@@ -63,5 +63,8 @@ class LineupSpec extends FlatSpec with Matchers {
     val arbitraryScore = IndividualLikeLineup.fitness(arbitraryLineup)
 
     all (scores) should be > arbitraryScore
+
+    Lineup.visualize(arbitraryLineup)
+    results.foreach(Lineup.visualize)
   }
 }

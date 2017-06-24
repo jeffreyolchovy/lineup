@@ -30,12 +30,8 @@ object Player {
     writableStats(ON_BASE_AVG) =
       (writableStats(HITS) + writableStats(WALKS)) /
       (writableStats(AT_BATS) + writableStats(WALKS) + writableStats(SACRIFICE_FLYOUTS))
-    writableStats(EXTRA_BASE_AVG) =
-      ((writableStats(DOUBLES) + 2) *
-       (writableStats(TRIPLES) + 3) *
-       writableStats(HOMERUNS) +
-       writableStats(WALKS)
-      ) / writableStats(AT_BATS)
+    writableStats(ISOLATED_POWER) =
+      writableStats(SLUGGING_PCT) - writableStats(BATTING_AVG)
     writableStats(PUT_IN_PLAY_PCT) =
       (1 - (writableStats(STRIKEOUTS) / writableStats(AT_BATS)))
     writableStats(HOMERUNS_PER_HIT) =

@@ -38,7 +38,7 @@ class LineupGui.Step1Form extends LineupGui.FormView
 
   initialize: ->
     super()
-    @players = (new LineupGui.Player('index': i) for i in [0..11])
+    @players = (new LineupGui.Player('index': i) for i in [0..8])
     return this
 
   render: ->
@@ -91,7 +91,7 @@ class LineupGui.Step2Form extends LineupGui.FormView
 
   initialize: ->
     super()
-    @specs = (new LineupGui.FitnessSpec('index': i) for i in [0..11])
+    @specs = (new LineupGui.FitnessSpec('index': i) for i in [0..8])
     return this
 
   render: ->
@@ -156,7 +156,7 @@ class LineupGui.Step2Form extends LineupGui.FormView
     {id:"AVG",name:"Batting Average",state:"+"}
     {id:"SLG",name:"Slugging Average",state:"+"}
     {id:"OBA",name:"On-Base Average",state:"+"}
-    {id:"EBA",name:"Extra-Base Average",state:"+"}
+    {id:"ISO",name:"Isolated Power",state:"+"}
     {id:"PIP",name:"Put-in-Play Percentage",state:"+"}
     {id:"HR/H",name:"Homeruns / Hit",state:"+"}
     {id:"BB/AB",name:"Walks / At-Bat",state:"+"}
@@ -177,7 +177,7 @@ class LineupGui.Step2Form extends LineupGui.FormView
       {id:"OBA",name:"On-Base Average",state:"+"}
       {id:"BB/AB",name:"Walks / At-Bat",state:"+"}
       {id:"PIP",name:"Put-in-Play Percentage",state:"-"}
-      {id:"EBA",name:"Extra-Base Average",state:"-"}
+      {id:"ISO",name:"Isolated Power",state:"-"}
     ]
 
     [
@@ -221,32 +221,6 @@ class LineupGui.Step2Form extends LineupGui.FormView
     [
       {id:"PIP",name:"Put-in-Play Percentage",state:"+"}
       {id:"OBA",name:"On-Base Average",state:"-"}
-    ]
-
-    [
-      {id:"PIP",name:"Put-in-Play Percentage",state:"+"}
-      {id:"HR/H",name:"Homeruns / Hit",state:"+"}
-      {id:"SLG",name:"Slugging Average",state:"-"}
-      {id:"OBA",name:"On-Base Average",state:"-"}
-      {id:"BB/AB",name:"Walks / At-Bat",state:"-"}
-    ]
-
-    [
-      {id:"1B/H",name:"Singles / Hit",state:"+"}
-      {id:"PIP",name:"Put-in-Play Percentage",state:"-"}
-      {id:"SO/AB",name:"Strike Outs / At-Bat",state:"-"}
-      {id:"SLG",name:"Slugging Average",state:"-"}
-      {id:"OBA",name:"On-Base Average",state:"-"}
-      {id:"BB/AB",name:"Walks / At-Bat",state:"-"}
-    ]
-
-    [
-      {id:"1B/H",name:"Singles / Hit",state:"+"}
-      {id:"PIP",name:"Put-in-Play Percentage",state:"-"}
-      {id:"SO/AB",name:"Strike Outs / At-Bat",state:"-"}
-      {id:"SLG",name:"Slugging Average",state:"-"}
-      {id:"OBA",name:"On-Base Average",state:"-"}
-      {id:"BB/AB",name:"Walks / At-Bat",state:"-"}
     ]
   ]
 
@@ -284,4 +258,3 @@ class LineupGui.Step3Form extends LineupGui.FormView
     @lineups.push(new LineupGui.Lineup('index': i, 'players': lineup))
     this.$el.children('.form-inputs').append(@lineups[i].el)
     @lineups[i].show()
-    
