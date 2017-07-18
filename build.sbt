@@ -9,7 +9,7 @@ inThisBuild(
 
 cancelable in Global := true
 
-lazy val root = (project in file(".")).aggregate(ga, common, cli, api, gui)
+lazy val root = (project in file(".")).aggregate(ga, common, api, gui)
 
 val ga = (project in file("ga"))
   .settings(
@@ -32,13 +32,6 @@ val common = (project in file("common"))
     )
   )
   .dependsOn(ga)
-
-val cli = (project in file("cli"))
-  .settings(
-    libraryDependencies += "ch.qos.logback" % "logback-classic" % "1.2.3",
-    mainClass in (Compile, run) := Some("com.olchovy.lineup.Cli")
-  )
-  .dependsOn(common)
 
 val api = (project in file("api"))
   .settings(
