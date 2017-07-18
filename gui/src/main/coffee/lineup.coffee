@@ -11,9 +11,8 @@ class LineupGui.Lineup extends LineupGui.View
     @isRendered = true
     this.$el.html @template(data: @data or {})
 
-    for playerName in @data.players
-      playerStats = _.find(LineupGui.app.players, (player) -> player.name == playerName)
-      playerView = new LineupGui.ReadOnlyPlayer('name': playerName, 'stats': playerStats)
+    for player in @data.players
+      playerView = new LineupGui.ReadOnlyPlayer(player)
       this.$el.append(playerView.el)
       playerView.show()
 

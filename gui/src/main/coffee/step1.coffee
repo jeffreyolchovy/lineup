@@ -4,9 +4,6 @@ class LineupGui.Step1View extends LineupGui.View
 
   template: LineupGui.templates.step1
 
-  events:
-    'click #import-roster-trigger': 'promptForTeamId'
-
   initialize: ->
     super()
 
@@ -32,12 +29,12 @@ class LineupGui.Step1View extends LineupGui.View
       i = (Number) i
 
       if players.length == i
-        players.push({'stats': {}, 'name': undefined})
+        players.push({'statistics': {}, 'name': undefined})
 
       if field == 'name'
         players[i].name = data[key] || ('Player ' + (i + 1))
       else
-        players[i].stats[field] = Number(data[key])
+        players[i].statistics[field] = Number(data[key])
 
     valid = _.reduce(players, ((acc, i) -> i.name || acc), null)
 
@@ -46,15 +43,3 @@ class LineupGui.Step1View extends LineupGui.View
     else
       LineupGui.app.navigate 'step2', trigger: true
       window.scrollTo(0, 0)
-
-  promptForTeamId: (e) =>
-    teamId = prompt('Enter your Island Slowpitch Team ID')
-
-    if teamId? && (not (teamId == ''))
-      $.get('/api/import?id=' + teamId, (error, response) => @importPlayers(teamId, response))
-
-  importPlayers: (teamId, data) =>
-    if data['players'].length
-      @form.load(data['players'])
-    else
-      alert("Failed to retrieve player data for Team ID #{teamId}")

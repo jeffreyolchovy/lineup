@@ -2,24 +2,33 @@
   p #{data.name}
 
 ul.stats
-  li AB
-    span #{data.stats.AB}
-  li H
-    span #{data.stats.H}
-  li 2B
-    span #{data.stats['2B']}
-  li 3B
-    span #{data.stats['3B']}
-  li HR
-    span #{data.stats.HR}
-  li RBI
-    span #{data.stats.RBI}
-  li R
-    span #{data.stats.R}
-  li BB
-    span #{data.stats.BB}
-  li SO
-    span #{data.stats.SO}
-  li SF
-    span #{data.stats.SF}
-
+  li
+    span.stat-name AB
+    span.stat-value #{data.statistics.AB}
+  li
+    span.stat-name H
+    span.stat-value #{data.statistics.H}
+  li
+    span.stat-name 2B
+    span.stat-value #{data.statistics['2B']}
+  li
+    span.stat-name 3B
+    span.stat-value #{data.statistics['3B']}
+  li
+    span.stat-name HR
+    span.stat-value #{data.statistics.HR}
+  li
+    span.stat-name RBI
+    span.stat-value #{data.statistics.RBI}
+  li
+    span.stat-name R
+    span.stat-value #{data.statistics.R}
+  li
+    span.stat-name BB
+    span.stat-value #{data.statistics.BB}
+  li
+    span.stat-name SO
+    span.stat-value #{data.statistics.SO}
+  li
+    span.stat-name SF
+    span.stat-value #{data.statistics.SF}

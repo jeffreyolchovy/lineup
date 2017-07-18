@@ -30,9 +30,8 @@ class PlayerJsonSerializationSpec extends FlatSpec with Matchers {
       """
     val json = parse(jsonString)
     val result = PlayerJsonSerialization.deserialize(json)
-    result should not be empty 
+    result should not be empty
     val player = result.get
-    println(player)
     player.name shouldBe "Foo"
     player.stats(AT_BATS) shouldBe 10.0
     player.stats(HITS) shouldBe 3.0
@@ -62,7 +61,7 @@ class PlayerJsonSerializationSpec extends FlatSpec with Matchers {
         """
       val json = parse(jsonString)
       val result = PlayerJsonSerialization.deserialize(json)
-      result shouldBe empty 
+      result shouldBe empty
     }
   }
 

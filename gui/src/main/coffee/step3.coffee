@@ -38,13 +38,14 @@ class LineupGui.Step3View extends LineupGui.View
       (_.map spec, (data) -> data.state + data.id).join ' '
 
     data =
-      players : players
-      strategy:
-        initial_population_size   : 2500
-        initial_fitness_threshold : 0.5
-        maximum_fitness_threshold : 3.5
-        maximum_generations       : 100
-        fitness_specification     : specs
+      chromosomes : players
+      selectors : [
+        { weight : 1, type : "top_n", features : { n : 0.1 } }
+      ]
+      operators : [
+        { weight : 3, type : "crossover" },
+        { weight : 1, type : "mutation" }
+      ]
 
     $.post '/api/lineups', data, (error, response) =>
       if not error

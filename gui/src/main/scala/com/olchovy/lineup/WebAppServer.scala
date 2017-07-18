@@ -1,43 +1,25 @@
 package com.olchovy.lineup
 
-import java.net.InetSocketAddress
 import scala.util.control.NonFatal
-import com.twitter.finagle.{Http, Service}
+import com.twitter.finagle.Service
 import com.twitter.finagle.http.path._
 import com.twitter.finagle.http.service.RoutingService
 import com.twitter.finagle.http.{Method, Request, Response, Status}
 import com.twitter.io.StreamIO
-import com.twitter.util.{Await, Future}
+import com.twitter.util.Future
 import org.slf4j.LoggerFactory
 import scalatags.Text.all._
 import scalatags.Text.tags2.title
+import com.olchovy.util.{Args, Server}
 
-class WebAppServer(port: Int) {
+case class WebAppServer(port: Int) extends Server {
 
   import WebAppServer._
 
-  private val service = ExceptionHandlingFilter andThen RoutingService.byMethodAndPathObject {
+  val service = ExceptionHandlingFilter andThen RoutingService.byMethodAndPathObject {
     case Method.Get -> Root => new IndexHandler
     case Method.Get -> Root / "assets" / ("scripts" | "styles") / _ => new AssetsHandler
     case Method.Post -> Root / "api" / "lineups" => new LineupsHandler
-    case Method.Post -> Root / "api" / "fitness" => new FitnessHandler
-  }
-
-  def run(): Unit = {
-    val bindAddress = new InetSocketAddress(port)
-    val server = Http.serve(bindAddress, service)
-    try {
-      log.info(s"Server listening at $bindAddress")
-      Await.ready(server)
-    } catch {
-      case e: InterruptedException =>
-        log.info("Server interrupted")
-        Thread.currentThread.interrupt()
-        throw e
-    } finally {
-      log.info("Server shutting down")
-      server.close()
-    }
   }
 }
 
@@ -46,9 +28,9 @@ object WebAppServer {
   private val log = LoggerFactory.getLogger(getClass)
 
   def main(args: Array[String]): Unit = {
-    val port = 8080
     try {
-      new WebAppServer(port).run()
+      val port = Args(args).required("port").toInt
+      WebAppServer(port).run()
     } catch {
       case NonFatal(e) =>
         log.error("Unexpected exception encountered", e)

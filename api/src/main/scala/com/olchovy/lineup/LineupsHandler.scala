@@ -3,23 +3,27 @@ package com.olchovy.lineup
 import com.twitter.finagle.Service
 import com.twitter.finagle.http.{Request, Response, Status}
 import com.twitter.util.Future
-//import spray.json._
-//import com.olchovy.lineup.serde.ApiJsonProtocol._
+import org.json4s._
+import org.json4s.native.JsonMethods.{compact, parse, render}
+import org.json4s.native.Serialization.{read, write}
+import com.olchovy.ga.GeneticAlgorithm
+import com.olchovy.lineup.serde._
 
 class LineupsHandler extends Service[Request, Response] {
+
+  implicit val individualLike = Lineup.IndividualLikeLineup
+
+  implicit val format = ((DefaultFormats
+    + PlayerJsonSerialization.serializer)
+    + (new GeneticAlgorithmJsonSerialization).serializer)
+
   def apply(request: Request) = {
-    /*
-    val input = ""//JsonParser(request.getContentString)
-    val (strategy, lineup) = (null, null)//input.convertTo[(Strategy, Lineup)]
-    val lineups = strategy.execute(lineup.players).map { lineup =>
-      (strategy.fitness(lineup), lineup.players.map(_.name))
-    }.toSeq.sortWith { (a, b) =>
-      a._1 > b._1
-    }.map(_._2)
-    */
-    val output = ""//Map("lineups" -> lineups).toJson
+    val jsonString = request.getContentString
+    val algorithm = read[GeneticAlgorithm[Lineup]](jsonString)
+    val lineups = algorithm()
+    val output = write(Map("lineups" -> lineups))
     val response = Response(request.version, Status.Ok)
-    response.setContentString(output/*.compactPrint*/)
+    response.setContentString(output)
     Future.value(response)
   }
 }

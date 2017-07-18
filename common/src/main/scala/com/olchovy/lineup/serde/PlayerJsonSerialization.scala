@@ -6,7 +6,7 @@ import org.json4s.JsonAST._
 import org.json4s.JsonDSL._
 import org.json4s.native.Serialization
 
-object PlayerJsonSerialization extends Json4sSerialization[Player] {
+object PlayerJsonSerialization {
 
   val serializer = new CustomSerializer[Player](
     implicit format => Function.unlift(deserialize _) -> Function.unlift(serialize _)
@@ -29,7 +29,7 @@ object PlayerJsonSerialization extends Json4sSerialization[Player] {
     ("name" -> player.name) ~ ("statistics" -> statsByAbbr)
   }
 
-  def serialize(any: Any)(implicit format: Formats): Option[JValue] = {
+  private def serialize(any: Any)(implicit format: Formats): Option[JValue] = {
     any match {
       case player: Player => Some(serialize(player))
       case _ => None

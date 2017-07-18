@@ -2,6 +2,7 @@ package com.olchovy.lineup
 
 import scala.util.matching.Regex
 import scala.util.parsing.combinator.RegexParsers
+import PlayerFitnessFunction._
 
 /** A grammar for defining fitness functions for a Player in a given Lineup
   *
@@ -14,8 +15,6 @@ import scala.util.parsing.combinator.RegexParsers
   */
 object PlayerFitnessFunctionParser extends RegexParsers {
 
-  private case class Token(sign: String, statistic: Statistic)
-
   private val EOL = """\z""".r
 
   private val sign = ( "+" | "-" )
@@ -26,25 +25,23 @@ object PlayerFitnessFunctionParser extends RegexParsers {
     }, "Unknown statistic abbreviation: " + _)
   }
 
-  private val token: Parser[Token] = {
-    sign ~ statistic ^^ {
-      case sign ~ statistic => Token(sign, statistic)
+  private val rule: Parser[Rule] = {
+    sign ~ statistic ^? ({
+      case "+" ~ stat => Rule(BetterThanAvg, stat)
+      case "-" ~ stat => Rule(WorseThanAvg, stat)
+    }, "Unknown statistic specification: " + _)
+  }
+
+  private val fitnessF: Parser[PlayerFitnessFunction] = {
+    (rule *) <~ EOL ^^ {
+      case rules => PlayerFitnessFunction(rules: _*)
     }
   }
 
-  private val fitnessF: Parser[(Lineup, Player) ⇒ Double] = (token *) <~ EOL ^^ {
-    case tokens =>
-      val functions = tokens.map { case Token(sign, statistic) =>
-        (lineup: Lineup, player: Player) => sign match {
-          case "+" => player.stats(statistic) - lineup.stats(statistic)
-          case "-" => lineup.stats(statistic) - player.stats(statistic)
-        }
-      }
-      (lineup: Lineup, player: Player) => functions.map(_.apply(lineup, player)).sum
-  }
-
-  def apply(input: String): (Lineup, Player) ⇒ Double = parse(fitnessF, input) match {
-    case Success(result, _) => result
-    case e: NoSuccess => throw new RuntimeException(e.toString)
+  def apply(input: String): PlayerFitnessFunction = {
+    parse(fitnessF, input) match {
+      case Success(result, _) => result
+      case e: NoSuccess => throw new RuntimeException(e.toString)
+    }
   }
 }

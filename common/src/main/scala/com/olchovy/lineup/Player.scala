@@ -13,7 +13,13 @@ object Player {
     val statsMap = stats.toMap.mapValues(ev.toDouble)
     val statsWithDefaultValues = Statistic.values.map { stat => stat -> statsMap.getOrElse(stat, 0D) }.toMap
     val statsWithComputedValues = computeRemainingStats(statsWithDefaultValues)
-    Player(name, statsWithComputedValues)
+    val statsWithZeroedValues = statsWithComputedValues.mapValues {
+      case n if java.lang.Double.isNaN(n) => 0D
+      case n if n == Double.PositiveInfinity => 0D
+      case n if n == Double.NegativeInfinity => 0D
+      case n => n
+    }
+    Player(name, statsWithZeroedValues)
   }
 
   private def computeRemainingStats(stats: Map[Statistic, Double]): Map[Statistic, Double] = {

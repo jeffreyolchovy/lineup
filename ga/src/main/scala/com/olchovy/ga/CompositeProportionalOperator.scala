@@ -2,13 +2,12 @@ package com.olchovy.ga
 
 case class CompositeProportionalOperator[A : Numeric, B](
   private val weightedOperator1: (A, Operator[B]),
-  private val weightedOperator2: (A, Operator[B]),
   private val additionalWeightedOperators: (A, Operator[B])*
 ) extends Operator[B] {
 
   private val proportionalOperators = ProportionalCollection[A, Operator[B]](
     weightedOperator1,
-    (weightedOperator2 +: additionalWeightedOperators): _*
+    additionalWeightedOperators: _*
   )
 
   private val proportionalOperatorIterator = proportionalOperators.iterator

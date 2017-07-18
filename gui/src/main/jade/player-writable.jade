@@ -6,7 +6,7 @@
       input(type="text", name="player_#{data.index}_name", placeholder="Player Name", value="#{data.name}")
 
 ul.stats
-  - if(!data.stats)
+  - if(!data.statistics)
     li.input-wrapper
       span AB
       input(type="text", name="player_#{data.index}_AB")
@@ -41,32 +41,32 @@ ul.stats
   - else
     li.input-wrapper
       span AB
-      input(type="text", name="player_#{data.index}_AB", value="#{data.stats.AB}")
+      input(type="text", name="player_#{data.index}_AB", value="#{data.statistics.AB}")
     li.input-wrapper
       span H
-      input(type="text", name="player_#{data.index}_H", value="#{data.stats.H}")
+      input(type="text", name="player_#{data.index}_H", value="#{data.statistics.H}")
     li.input-wrapper
       span 2B
-      input(type="text", name="player_#{data.index}_2B", value="#{data.stats['2B']}")
+      input(type="text", name="player_#{data.index}_2B", value="#{data.statistics['2B']}")
     li.input-wrapper
       span 3B
-      input(type="text", name="player_#{data.index}_3B", value="#{data.stats['3B']}")
+      input(type="text", name="player_#{data.index}_3B", value="#{data.statistics['3B']}")
     li.input-wrapper
       span HR
-      input(type="text", name="player_#{data.index}_HR", value="#{data.stats.HR}")
+      input(type="text", name="player_#{data.index}_HR", value="#{data.statistics.HR}")
     li.input-wrapper
       span RBI
-      input(type="text", name="player_#{data.index}_RBI", value="#{data.stats.RBI}")
+      input(type="text", name="player_#{data.index}_RBI", value="#{data.statistics.RBI}")
     li.input-wrapper
       span R
-      input(type="text", name="player_#{data.index}_R", value="#{data.stats.R}")
+      input(type="text", name="player_#{data.index}_R", value="#{data.statistics.R}")
     li.input-wrapper
       span BB
-      input(type="text", name="player_#{data.index}_BB", value="#{data.stats.BB}")
+      input(type="text", name="player_#{data.index}_BB", value="#{data.statistics.BB}")
     li.input-wrapper
       span SO
-      input(type="text", name="player_#{data.index}_SO", value="#{data.stats.SO}")
+      input(type="text", name="player_#{data.index}_SO", value="#{data.statistics.SO}")
     li.input-wrapper
       span SF
-      input(type="text", name="player_#{data.index}_SF", value="#{data.stats.SF}")
+      input(type="text", name="player_#{data.index}_SF", value="#{data.statistics.SF}")
 

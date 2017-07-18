@@ -255,6 +255,6 @@ class LineupGui.Step3Form extends LineupGui.FormView
 
   push: (lineup) =>
     i = this.$('.lineup').size()
-    @lineups.push(new LineupGui.Lineup('index': i, 'players': lineup))
+    @lineups.push(new LineupGui.Lineup(lineup))
     this.$el.children('.form-inputs').append(@lineups[i].el)
     @lineups[i].show()

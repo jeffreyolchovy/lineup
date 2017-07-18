@@ -25,6 +25,8 @@ val common = (project in file("common"))
     libraryDependencies ++= Seq(
       "org.scala-lang.modules" %% "scala-parser-combinators" % "1.0.6",
       "org.json4s" %% "json4s-native" % "3.5.2",
+      "com.twitter" %% "finagle-core" % "6.44.0",
+      "com.twitter" %% "finagle-http" % "6.44.0",
       "org.scalatest" %% "scalatest"  % "3.0.1" % Test,
       "ch.qos.logback" % "logback-classic" % "1.2.3" % Test
     )
@@ -40,11 +42,7 @@ val cli = (project in file("cli"))
 
 val api = (project in file("api"))
   .settings(
-    libraryDependencies ++= Seq(
-      "ch.qos.logback" % "logback-classic" % "1.2.3",
-      "com.twitter" %% "finagle-core" % "6.44.0",
-      "com.twitter" %% "finagle-http" % "6.44.0"
-    ),
+    libraryDependencies += "ch.qos.logback" % "logback-classic" % "1.2.3",
     mainClass in (Compile, run) := Some("com.olchovy.lineup.ApiServer")
   )
   .dependsOn(common)
