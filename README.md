@@ -1,18 +1,30 @@
-Lineup
-======
-
+# Lineup
 A genetic algorithm for optimizing baseball and softball lineups.
 
-How it works
-------------
-Given a set of players, an initial, random set of lineups is generated.
+![GUI step #1 screenshot](https://github.com/jeffreyolchovy/lineup/raw/master/screenshots/step1.png)
+![GUI step #2 screenshot](https://github.com/jeffreyolchovy/lineup/raw/master/screenshots/step2.png)
 
-Each lineup is scored by a given fitness function.
+## Usage
+Front-end/GUI (node/npm) dependencies are downloaded via sbt.
 
-High-scoring lineups are retained while low-scoring lineups are discarded.
+From an interactive sbt session, issue:
+```
+> project gui
+> run --port 8080
+```
 
-Lineups then undergo independent mutation or are recombinated with other lineups.
+Visit http://localhost:8080 in a browser to enter your roster and generate lineups.
 
-This process is repeated until some maximum number of generations has been reached.
+## Project structure
 
-The solution set of high-scoring lineups is the return value of the algorithm.
+### ga
+A library for the construction and execution of genetic algorithms.
+
+### common
+Shared resources (domain objects, [de]serializers, etc.) used by both the api and gui projects.
+
+### api
+A REST API for generating lineups given a roster and strategy.
+
+### gui
+A web application and server, with browser-based GUI, for generating lineups.
