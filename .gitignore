@@ -1,8 +1,5 @@
 target
-project/boot
 project/target
-
-examples/api/jetty
 
 *.swp
 *.bak
