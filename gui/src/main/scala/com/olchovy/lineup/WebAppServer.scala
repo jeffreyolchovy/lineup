@@ -18,7 +18,8 @@ case class WebAppServer(port: Int) extends Server {
 
   val service = ExceptionHandlingFilter andThen RoutingService.byMethodAndPathObject {
     case Method.Get -> Root => new IndexHandler
-    case Method.Get -> Root / "assets" / ("scripts" | "styles") / _ => new AssetsHandler
+    case Method.Get -> Root / "assets" / ("scripts" | "styles") / _ => AssetsHandler
+    case Method.Get -> Root / "assets" / "scripts" / "third-party" / _ => AssetsHandler
     case Method.Post -> Root / "api" / "lineups" => new LineupsHandler
   }
 }
@@ -55,11 +56,11 @@ object WebAppServer {
         link(href := "/assets/styles/token-input.css", rel := "stylesheet")
       ),
       body(
-        script(src := "/assets/scripts/zepto.js"),
-        script(src := "/assets/scripts/underscore.js"),
+        script(src := "/assets/scripts/third-party/zepto.js"),
+        script(src := "/assets/scripts/third-party/underscore.js"),
         script(src := "/assets/scripts/zepto._.tokeninput.js"),
-        script(src := "/assets/scripts/backbone.js"),
-        script(src := "/assets/scripts/jade-runtime.js"),
+        script(src := "/assets/scripts/third-party/backbone.js"),
+        script(src := "/assets/scripts/third-party/jade-runtime.js"),
         script(src := "/assets/scripts/templates.js"),
         script(src := "/assets/scripts/main.js"),
         script(
@@ -72,7 +73,7 @@ object WebAppServer {
     )
   }
 
-  class AssetsHandler extends Service[Request, Response] {
+  object AssetsHandler extends Service[Request, Response] {
     def apply(request: Request) = {
       val stream = getClass.getResourceAsStream(request.path)
       val response = Response(request.version, Status.Ok)
