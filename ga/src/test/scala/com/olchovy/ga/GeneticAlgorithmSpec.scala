@@ -11,12 +11,12 @@ class GeneticAlgorithmSpec extends FlatSpec with Matchers {
     implicit val individualLike = IndividualLikeImpls.individualLikeBitSeq
     val sample = Seq(true, true, false, false)
     val ideal = Seq(true, true, true, true)
-    val algorithm = GeneticAlgorithm.newBuilder[Seq[Boolean]]
-      .withInitializer(Initializer.fromSample(sample, populationSize = 4)(Random.shuffle))
-      .withSelector(Selector.elitist(percentage = 0.1))
-      .withOperator(Operator.binaryPointMutation)
-      .withTerminator(Terminator.criteriaBased(_.currentPopulation.contains(ideal)))
-      .build()
+    val algorithm = GeneticAlgorithm[Seq[Boolean]](
+      Initializer.fromSample(sample, populationSize = 4)(Random.shuffle),
+      Selector.elitist(percentage = 0.1),
+      Operator.binaryPointMutation,
+      Terminator.criteriaBased(_.currentPopulation.contains(ideal))
+    )
     val result = algorithm()
     result should contain (ideal)
   }
@@ -35,12 +35,12 @@ class GeneticAlgorithmSpec extends FlatSpec with Matchers {
       1 -> Operator.replacementPointMutation(Random.nextInt(size)),
       3 -> Operator.crossover
     )
-    val algorithm = GeneticAlgorithm.newBuilder[Seq[Int]]
-      .withInitializer(Initializer.fromSample(sample, populationSize = 2500)(Random.shuffle))
-      .withSelector(selector)
-      .withOperator(operator)
-      .withTerminator(Terminator.criteriaBased(_.currentPopulation.contains(ideal)))
-      .build()
+    val algorithm = GeneticAlgorithm[Seq[Int]](
+      Initializer.fromSample(sample, populationSize = 2500)(Random.shuffle),
+      selector,
+      operator,
+      Terminator.criteriaBased(_.currentPopulation.contains(ideal))
+    )
     val result = algorithm()
     result should contain (ideal)
   }

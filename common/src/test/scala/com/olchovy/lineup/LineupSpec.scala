@@ -47,16 +47,15 @@ class LineupSpec extends FlatSpec with Matchers {
       Player("J", AT_BATS -> 8, HITS -> 5, DOUBLES -> 3, HOMERUNS -> 1, WALKS -> 1, STRIKEOUTS -> 1)
     )
 
-    val results = GeneticAlgorithm.newBuilder[Lineup]
-      .withInitializer(Initializer.fromChromosomes(players, populationSize = 30) {
+    val algorithm = GeneticAlgorithm[Lineup](
+      Initializer.fromChromosomes(players, populationSize = 30) {
         RandomUtils.arrayShuffle(_).take(9)
-      })
-      .withSelector(Selector.elitist(percentage = 0.1))
-      .withOperator(Operator.crossover)
-      .withTerminator(Terminator.generationBased(maxGenerations = 2500))
-      .build()
-      .apply()
-
+      },
+      Selector.elitist(percentage = 0.1),
+      Operator.crossover,
+      Terminator.generationBased(maxGenerations = 2500)
+    )
+    val results = algorithm()
     val scores = results.map(IndividualLikeLineup.fitness)
 
     val arbitraryLineup = Lineup(players.take(9).toSeq)

@@ -29,19 +29,11 @@ object BaseballGeneticAlgorithm {
     require(weightedSelectors.nonEmpty)
     require(weightedOperators.nonEmpty)
 
-    GeneticAlgorithm.newBuilder[Lineup]
-      .withInitializer(
-        Initializer.fromChromosomes(chromosomes, DefaultInitialPopulationSize)(RandomUtils.arrayShuffle)
-      )
-      .withSelector(
-        CompositeProportionalSelector(weightedSelectors.head, weightedSelectors.tail: _*)
-      )
-      .withOperator(
-        CompositeProportionalOperator(weightedOperators.head, weightedOperators.tail: _*)
-      )
-      .withTerminator(
-        Terminator.generationBased(DefaultMaxGenerations)
-      )
-      .build()
+    GeneticAlgorithm[Lineup](
+      Initializer.fromChromosomes(chromosomes, DefaultInitialPopulationSize)(RandomUtils.arrayShuffle),
+      CompositeProportionalSelector(weightedSelectors.head, weightedSelectors.tail: _*),
+      CompositeProportionalOperator(weightedOperators.head, weightedOperators.tail: _*),
+      Terminator.generationBased(DefaultMaxGenerations)
+    )
   }
 }
