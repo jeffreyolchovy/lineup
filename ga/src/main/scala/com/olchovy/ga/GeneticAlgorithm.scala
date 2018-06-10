@@ -20,6 +20,7 @@ case class GeneticAlgorithm[A](
       currentPopulation = initPopulation,
       currentGeneration = 0
     )
+    log.info("Executing algorithm...")
     while (hasNext(state)) {
       state = next(state)
     }
@@ -32,7 +33,7 @@ case class GeneticAlgorithm[A](
         log.info("Terminating algorithm execution")
         false
       case Terminator.Continue =>
-        log.info(s"Executing algorithm (generation ${state.currentGeneration})")
+        log.debug(s"Executing algorithm (generation ${state.currentGeneration})")
         true
     }
   }
