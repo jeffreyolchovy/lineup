@@ -6,7 +6,11 @@ import org.json4s._
 object PlayerFitnessFunctionJsonSerialization {
 
   val serializer = new CustomSerializer[PlayerFitnessFunction](
-    implicit format => Function.unlift(deserialize _) -> Function.unlift(serialize _)
+    implicit format =>
+      Function.unlift(deserialize _) ->
+      {
+        case _: PlayerFitnessFunction => throw new UnsupportedOperationException
+      }
   )
 
   def deserialize(json: JValue)(implicit format: Formats): Option[PlayerFitnessFunction] = {
@@ -16,9 +20,5 @@ object PlayerFitnessFunctionJsonSerialization {
       case _ => None
     }
     input.map(PlayerFitnessFunctionParser.apply)
-  }
-
-  private def serialize(any: Any)(implicit format: Formats): Option[JValue] = {
-    throw new UnsupportedOperationException
   }
 }

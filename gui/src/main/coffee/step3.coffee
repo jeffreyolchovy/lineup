@@ -46,6 +46,7 @@ class LineupGui.Step3View extends LineupGui.View
         { weight : 3, type : "crossover" },
         { weight : 1, type : "mutation" }
       ]
+      fitness_functions : specs
 
     $.post '/api/lineups', data, (error, response) =>
       if not error

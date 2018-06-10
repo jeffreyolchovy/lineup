@@ -6,19 +6,19 @@ import com.twitter.util.Future
 import org.json4s._
 import org.json4s.native.JsonMethods.{compact, parse, render}
 import org.json4s.native.Serialization.{read, write}
-import com.olchovy.ga.GeneticAlgorithm
+import com.olchovy.ga.{GeneticAlgorithm, IndividualLike}
 import com.olchovy.lineup.serde._
 
 class LineupsHandler extends Service[Request, Response] {
 
-  implicit val individualLike = Lineup.IndividualLikeLineup
-
-  implicit val format = ((DefaultFormats
-    + PlayerJsonSerialization.serializer)
+  implicit val format = (DefaultFormats
+    + IndividualLikeJsonSerialization.serializer
+    + PlayerJsonSerialization.serializer
     + (new GeneticAlgorithmJsonSerialization).serializer)
 
   def apply(request: Request) = {
     val jsonString = request.getContentString
+    implicit val individualLike = read[IndividualLike[Lineup, Player, Double]](jsonString)
     val algorithm = read[GeneticAlgorithm[Lineup]](jsonString)
     val lineups = algorithm()
     val output = write(Map("lineups" -> lineups))
