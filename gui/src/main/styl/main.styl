@@ -269,3 +269,44 @@ button
 
     .anchor-wrapper
       float left
+
+.spinner
+  @keyframes spinner-animation {
+    to {transform: rotate(360deg);}
+  }
+
+  .spinner-animation:before
+    content ''
+    box-sizing border-box
+    position absolute
+    top 50%
+    left 50%
+    width 20px
+    height 20px
+    margin-top -10px
+    margin-left -10px
+    border-radius 50%
+    border 2px solid #ccc
+    border-top-color #666
+    animation: spinner-animation .6s linear infinite
+
+  .spinner-container
+    position relative
+    width 20px
+    height 20px
+
+  span.text
+    display inline-block
+    color #666
+
+  .table
+    display table
+
+    .record
+      display table-cell
+      vertical-align middle
+      overflow hidden
+
+      .entry
+        float left
+        margin-right 0.5em

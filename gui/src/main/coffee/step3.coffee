@@ -13,6 +13,8 @@ class LineupGui.Step3View extends LineupGui.View
     @form = new LineupGui.Step3Form
     @form.on 'submit', @onSubmit
 
+    @spinner = new LineupGui.Spinner text: 'Generating lineups...'
+
     return this
 
   render: ->
@@ -20,6 +22,10 @@ class LineupGui.Step3View extends LineupGui.View
 
     this.$el.children('.bd').append(@form.el)
     @form.show()
+
+    this.$('.button-wrapper').append(@spinner.el)
+    @spinner.show(true)
+
     @fetchLineups()
 
     return this
@@ -49,6 +55,7 @@ class LineupGui.Step3View extends LineupGui.View
       fitness_functions : specs
 
     $.post '/api/lineups', data, (error, response) =>
+      @spinner.hide()
       if not error
         @importLineups(response)
       else

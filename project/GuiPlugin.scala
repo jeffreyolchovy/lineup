@@ -68,6 +68,7 @@ object GuiPlugin extends AutoPlugin {
       "lineup.coffee",
       "player.coffee",
       "spec.coffee",
+      "spinner.coffee",
       "step1.coffee",
       "step2.coffee",
       "step3.coffee"
