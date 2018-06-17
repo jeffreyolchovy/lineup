@@ -39,7 +39,7 @@ object GuiPlugin extends AutoPlugin {
       val bin = npmExecutable.value
       val etc = baseDirectory.value / "etc"
       val prefix = nodeModulesDirectory.value.getParentFile
-      Process(s"$bin install $etc --no-shrinkwrap --prefix $prefix") ! log
+      Process(s"$bin install $etc --no-shrinkwrap --prefix $prefix --loglevel=error") ! log
     },
     /*
     npmUpdate := {
